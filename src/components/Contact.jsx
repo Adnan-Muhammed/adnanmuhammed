@@ -18,7 +18,7 @@ import { GlassCard } from './ui/GlassCard';
 import { Reveal } from './ui/Reveal';
 
 export default function Contact() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -67,12 +67,19 @@ export default function Contact() {
           <SectionTitle
             eyebrow={t('contact.badge', 'Get in Touch')}
             title={
-              <>
-                Let&apos;s Build Something{' '}
-                <span className="gold-gradient-text">Resilient</span>
-              </>
+              lang === 'ar' ? (
+          <>
+            تواصل لبدء{' '}
+            <span className="gold-gradient-text">العمل الهندسي</span>
+          </>
+          ) : (
+          <>
+            Let&apos;s Build Something{' '}
+            <span className="gold-gradient-text">Resilient</span>
+          </>
+          )
             }
-            subtitle={t('contact.subtitle', 'Available for full-time Full-Stack, Backend Engineering, and Cloud/DevOps opportunities. Let us connect.')}
+          subtitle={t('contact.subtitle', 'Available for full-time Full-Stack, Backend Engineering, and Cloud/DevOps opportunities. Let us connect.')}
           />
         </Reveal>
 

@@ -15,7 +15,7 @@ import { Reveal } from './ui/Reveal';
 import { useLanguage } from '../i18n';
 
 export default function Projects() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [previewImage, setPreviewImage] = useState(null);
 
   const projects = [
@@ -111,12 +111,19 @@ export default function Projects() {
           <SectionTitle
             eyebrow={t('projects.badge', 'Featured Work')}
             title={
-              <>
-                Real-World Production{' '}
-                <span className="gold-gradient-text">Applications</span>
-              </>
+              lang === 'ar' ? (
+          <>
+            مشاريع وأنظمة{' '}
+            <span className="gold-gradient-text">إنتاجية حقيقية</span>
+          </>
+          ) : (
+          <>
+            Real-World Production{' '}
+            <span className="gold-gradient-text">Applications</span>
+          </>
+          )
             }
-            subtitle={t('projects.subtitle', 'End-to-end applications built with deliberate architectural decisions, cloud deployments, and solving real user problems.')}
+          subtitle={t('projects.subtitle', 'End-to-end applications built with deliberate architectural decisions, cloud deployments, and solving real user problems.')}
           />
         </Reveal>
 

@@ -17,7 +17,7 @@ import { Reveal } from './ui/Reveal';
 import { useLanguage } from '../i18n';
 
 export default function Architecture() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   return (
     <section className="relative py-28 bg-[#070A12] dark:bg-[#070A12] light:bg-[#F8FAFC] border-t border-white/5 dark:border-white/5 light:border-slate-200 overflow-hidden transition-colors duration-300" id="architecture">
@@ -29,12 +29,19 @@ export default function Architecture() {
           <SectionTitle
             eyebrow={t('architecture.badge', 'Systems Deep-Dive')}
             title={
-              <>
-                Cloud Infrastructure &amp;{' '}
-                <span className="gold-gradient-text">System Architecture</span>
-              </>
+              lang === 'ar' ? (
+          <>
+            البنية السحابية{' '}
+            <span className="gold-gradient-text">وهندسة الأنظمة</span>
+          </>
+          ) : (
+          <>
+            Cloud Infrastructure &amp;{' '}
+            <span className="gold-gradient-text">System Architecture</span>
+          </>
+          )
             }
-            subtitle={t('architecture.subtitle', 'Transparent technical breakdowns of how my applications handle security, storage, real-time media, and automated deployment.')}
+          subtitle={t('architecture.subtitle', 'Transparent technical breakdowns of how my applications handle security, storage, real-time media, and automated deployment.')}
           />
         </Reveal>
 

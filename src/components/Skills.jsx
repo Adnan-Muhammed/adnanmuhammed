@@ -166,7 +166,7 @@ const getInnerGridClasses = (id) => {
 };
 
 export default function Skills() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   return (
     <section className="relative py-20 sm:py-24 bg-[#070A12] dark:bg-[#070A12] light:bg-[#F8FAFC] border-t border-white/5 dark:border-white/5 light:border-slate-200 overflow-hidden transition-colors duration-300" id="skills">
@@ -175,12 +175,19 @@ export default function Skills() {
           <SectionTitle
             eyebrow={t('skills.badge', 'Technical Matrix')}
             title={
-              <>
-                Skills &amp; Capabilities{' '}
-                <span className="gold-gradient-text">Matrix</span>
-              </>
+              lang === 'ar' ? (
+          <>
+            الكفاءات والقدرات التقنية{' '}
+            <span className="gold-gradient-text">الأساسية</span>
+          </>
+          ) : (
+          <>
+            Skills &amp; Capabilities{' '}
+            <span className="gold-gradient-text">Matrix</span>
+          </>
+          )
             }
-            subtitle={t('skills.subtitle', 'Verified competencies applied across production architectures and real-time systems.')}
+          subtitle={t('skills.subtitle', 'Verified competencies applied across production architectures and real-time systems.')}
           />
         </Reveal>
 

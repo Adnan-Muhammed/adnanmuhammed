@@ -109,7 +109,7 @@ const COMMANDS = {
 const quickChips = ['help', 'about', 'projects', 'skills', 'cv', 'hire', 'contact', 'clear'];
 
 export default function Terminal() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const [history, setHistory] = useState([
     { type: 'output', text: 'Adnan Muhammed Developer Console [v4.0.0-noir]' },
@@ -188,7 +188,15 @@ export default function Terminal() {
         {/* Section Title */}
         <div className="text-center">
           <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold font-heading text-white tracking-tight">
-            Developer <span className="gold-gradient-text">Console</span>
+            {lang === 'ar' ? (
+              <>
+                الطرفية البرمجية <span className="gold-gradient-text">التفاعلية</span>
+              </>
+            ) : (
+              <>
+                Developer <span className="gold-gradient-text">Console</span>
+              </>
+            )}
           </h2>
           <p className="mt-2 sm:mt-3 text-xs sm:text-sm md:text-base text-[#9AA4BC] max-w-2xl mx-auto">
             {t(

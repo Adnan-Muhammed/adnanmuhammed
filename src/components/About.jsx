@@ -14,7 +14,7 @@ import { Reveal } from './ui/Reveal';
 import { useLanguage } from '../i18n';
 
 export default function About() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   const targetRoles = [
     { title: 'Full-Stack Developer', desc: 'Next.js, React, Node.js, Express, TypeScript, REST APIs' },
@@ -32,12 +32,19 @@ export default function About() {
           <SectionTitle
             eyebrow={t('about.badge', 'Engineering Background')}
             title={
-              <>
-                Engineering Production-Grade{' '}
-                <span className="gold-gradient-text">Web &amp; Cloud Systems</span>
-              </>
+              lang === 'ar' ? (
+          <>
+            هندسة برمجيات متكاملة{' '}
+            <span className="gold-gradient-text">وأنظمة سحابية للإنتاج</span>
+          </>
+          ) : (
+          <>
+            Engineering Production-Grade{' '}
+            <span className="gold-gradient-text">Web &amp; Cloud Systems</span>
+          </>
+          )
             }
-            subtitle={t('about.subtitle', 'Focused on clean architecture, resilient backend services, and automated cloud deployments.')}
+          subtitle={t('about.subtitle', 'Focused on clean architecture, resilient backend services, and automated cloud deployments.')}
           />
         </Reveal>
 
