@@ -411,17 +411,56 @@ export default function CVSection() {
 
               {/* Modal PDF Viewport with internal scroll */}
                 <div className="flex-1 w-full h-full bg-[#0E1320] overflow-hidden relative">
-                  <object
-                    data={`${previewCvPath}#view=FitH&toolbar=1`}
-                    type="application/pdf"
-                    className="w-full h-full"
-                  >
-                    <iframe
-                      src={`${previewCvPath}#view=FitH&toolbar=1`}
-                      title="Adnan Muhammed CV"
-                      className="w-full h-full border-0"
-                    />
-                  </object>
+                  {/* Desktop PDF Viewer */}
+                  <div className="hidden sm:block w-full h-full">
+                    <object
+                      data={`${previewCvPath}#view=FitH&toolbar=1`}
+                      type="application/pdf"
+                      className="w-full h-full"
+                    >
+                      <iframe
+                        src={`${previewCvPath}#view=FitH&toolbar=1`}
+                        title="Adnan Muhammed CV"
+                        className="w-full h-full border-0"
+                      />
+                    </object>
+                  </div>
+
+                  {/* Mobile-Friendly Native Viewer fallback (prevents 'refused to connect' on phones) */}
+                  <div className="flex sm:hidden flex-col items-center justify-center h-full p-6 text-center space-y-4 bg-[#070A12]">
+                    <div className="w-16 h-16 rounded-2xl bg-[#0E1320] border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37] text-2xl shadow-lg">
+                      <FiFileText />
+                    </div>
+                    <div>
+                      <h5 className="font-heading font-bold text-white text-base">
+                        {t('cvSection.mobileFallbackTitle', 'Adnan Muhammed — Engineering Resume')}
+                      </h5>
+                      <p className="text-xs text-[#9AA4BC] mt-1 max-w-xs">
+                        {t('cvSection.mobileFallbackDesc', 'Production-Ready Full-Stack Developer (MERN & Next.js, Docker, AWS EC2)')}
+                      </p>
+                    </div>
+                    <div className="flex flex-col w-full gap-2.5 pt-2">
+                      <a
+                        href={previewCvPath}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={handleOpenTab}
+                        className="w-full py-2.5 rounded-full bg-gradient-to-r from-[#F5E6A8] via-[#D4AF37] to-[#C59B27] text-[#070A12] font-heading font-bold text-xs text-center shadow-md flex items-center justify-center gap-1.5"
+                      >
+                        <FiExternalLink size={14} />
+                        <span>{t('cvSection.openInTab', 'Open PDF in Full Screen')}</span>
+                      </a>
+                      <a
+                        href={downloadCvPath}
+                        download="Adnan-Muhammed-CV.pdf"
+                        onClick={handleDownload}
+                        className="w-full py-2.5 rounded-full bg-[#141A2B] text-white border border-white/10 text-xs text-center flex items-center justify-center gap-1.5"
+                      >
+                        <FiDownload size={14} />
+                        <span>{t('cvSection.downloadPdf', 'Download PDF Document')}</span>
+                      </a>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Modal Bottom Bar - Replaces blank bottom space with thumb-friendly controls */}
