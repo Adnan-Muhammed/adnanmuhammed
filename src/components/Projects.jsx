@@ -25,7 +25,7 @@ export default function Projects() {
       region: 'Vercel • AWS EC2 • Docker Compose • CI/CD',
       title: t('projects.zydoc.title', 'ZyDocCare Health'),
       live: 'https://carehealth.online',
-      image: '/projects_image/zydocare_health.png',
+      image: '/images/projects_image/zydocare_health.png',
       icon: <FiVideo className="text-[#D4AF37]" size={18} />,
       problem: t('projects.zydoc.problem', 'Telemedicine platforms face critical real-world edge cases: double-booking race conditions during simultaneous checkouts, dropped video calls during network fluctuations, and privacy risks with patient medical documents.'),
       solution: t('projects.zydoc.solution', 'Architected a modular full-stack system with Next.js deployed on Vercel and a Node.js backend structured using Clean Architecture on AWS EC2. Implemented Google OAuth & JWT authentication, atomic MongoDB slot reservation locks, WebRTC video with Socket.io signaling & reconnection handling, idempotent Razorpay refunds, and AWS S3 presigned URLs. Automated CI/CD deployments to AWS EC2 via GitHub Actions, Docker Compose, and Nginx.'),
@@ -52,7 +52,7 @@ export default function Projects() {
       region: 'Next.js 16 • Supabase • WebRTC • Gemini AI',
       title: t('projects.linguachat.title', 'LinguaChat — AI English Platform'),
       live: 'https://linguachat-omega.vercel.app',
-      image: '/projects_image/linguaChat_AI2.png',
+      image: '/images/projects_image/linguaChat_AI2.png',
       imageFit: 'object-contain',
       imagePosition: 'object-center',
       objectPosition: 'center',
@@ -78,7 +78,7 @@ export default function Projects() {
       region: 'AWS EC2 • PM2 • Node.js • Express • MongoDB',
       title: t('projects.ecommerce.title', 'Full-Stack E-Commerce & Order Engine'),
       live: '',
-      image: '/projects_image/e-commerce_website.png',
+      image: '/images/projects_image/e-commerce_website.png',
       icon: <FiShoppingBag className="text-[#A78BFA]" size={18} />,
       problem: t('projects.ecommerce.problem', 'E-commerce systems require resilient order lifecycle state machines, seamless payment gateways with refund handling, secure authentication, and optimized aggregation for complex sales analytics without database bottlenecks.'),
       solution: t('projects.ecommerce.solution', 'Architected a full-stack MVC application with Node.js, Express, and MongoDB, deployed to production on AWS EC2 using PM2 process manager for high availability. Integrated Razorpay alongside an in-app Wallet payment/refund workflow, Nodemailer OTP verification, PDFKit dynamic invoice generation, Multer image uploads, and compound indexing with aggregation pipelines for real-time sales reporting.'),
@@ -134,183 +134,183 @@ export default function Projects() {
                     {/* Browser Mockup Visual */}
                     <div className="rounded-2xl overflow-hidden border border-white/10 bg-[#0E1320] shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
                       {/* Browser Chrome Header */}
-                            <div className="px-3.5 py-2 bg-[#141A2B] border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 text-xs font-mono text-[#9AA4BC]">
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <div className="flex items-center gap-1.5 shrink-0">
-                                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF3D8B]/80" />
-                                  <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]/80" />
-                                  <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]/80" />
-                                </div>
-                                <span className="ms-1.5 text-[11px] text-[#9AA4BC] truncate">
-                                  {project.live ? project.live.replace(/^https?:\/\//, '') : 'backend-engine • archival'}
-                                </span>
-                              </div>
-                              <span className="text-[10px] text-[#D4AF37] font-semibold text-start sm:text-end truncate max-w-[210px] shrink-0">
-                                {project.region}
-                              </span>
-                            </div>
-
-                            {/* Browser Viewport with Project Screenshot */}
-                            <div
-                              onClick={() => setPreviewImage(project.image)}
-                              className="relative aspect-[16/10] overflow-hidden bg-[#0A0D18] flex items-center justify-center cursor-zoom-in group/mockup"
-                              title="Click to view full screenshot"
-                            >
-                              <img
-                                src={project.image}
-                                alt={`${project.title} screenshot`}
-                                className={`w-full h-full ${project.imageFit || 'object-cover'} ${project.imagePosition || 'object-top'} transition-all duration-300 group-hover/mockup:scale-[1.02]`}
-                                style={project.objectPosition ? { objectPosition: project.objectPosition } : undefined}
-                                onError={(e) => {
-                                  if (!e.currentTarget.dataset.fallbackTried) {
-                                    e.currentTarget.dataset.fallbackTried = 'true';
-                                    if (project.id === 'linguachat') {
-                                      e.currentTarget.src = '/projects_image/linguachat_ai.png';
-                                      return;
-                                    }
-                                    if (project.id === 'ecommerce') {
-                                      e.currentTarget.src = '/projects_image/ecommerce_website.png';
-                                      return;
-                                    }
-                                  }
-                                }}
-                              />
-
-                              {/* Subtle Expand Indicator */}
-                              <div className="absolute bottom-2.5 end-2.5 p-1.5 rounded-lg bg-[#070A12]/80 border border-white/10 text-[#D4AF37] opacity-0 group-hover/mockup:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-mono shadow-md backdrop-blur-sm pointer-events-none">
-                                <FiMaximize2 size={12} />
-                                <span>Full View</span>
-                              </div>
-                            </div>
-                        </div>
-
-                        {/* Tech Stack Chips */}
-                        <div className="space-y-1.5 pt-1">
-                          <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#9AA4BC]/80 block">
-                            Technologies Used
-                          </span>
-                          <div className="flex flex-wrap gap-1.5">
-                            {project.stack.map((tech) => (
-                              <span
-                                key={tech}
-                                className="px-2.5 py-1 rounded-lg bg-[#141A2B] border border-white/10 text-[11px] font-mono text-[#F4F6FB]"
-                              >
-                                {tech}
-                              </span>
-                            ))}
+                      <div className="px-3.5 py-2 bg-[#141A2B] border-b border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-2 text-xs font-mono text-[#9AA4BC]">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#FF3D8B]/80" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]/80" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]/80" />
                           </div>
+                          <span className="ms-1.5 text-[11px] text-[#9AA4BC] truncate">
+                            {project.live ? project.live.replace(/^https?:\/\//, '') : 'backend-engine • archival'}
+                          </span>
                         </div>
-
-                        {/* Action Buttons */}
-                        <div className="pt-1 flex flex-wrap items-center gap-2.5">
-                          {project.live ? (
-                            <a
-                              href={project.live}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-heading font-semibold text-xs bg-gradient-to-r from-[#D4AF37] to-[#F5E6A8] text-[#070A12] hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:scale-105 transition-all cursor-pointer"
-                            >
-                              <span>{t('work.visitSite', 'Visit live site')}</span>
-                              <FiExternalLink size={13} />
-                            </a>
-                          ) : null}
-
-                          <a
-                            href="#architecture"
-                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-heading font-medium text-xs text-[#9AA4BC] hover:text-white border border-white/10 hover:border-[#D4AF37]/40 bg-[#0E1320] transition-colors"
-                          >
-                            <FiLayers size={13} className="text-[#22D3EE]" />
-                            <span>{t('projects.viewArchitecture', 'Architecture Breakdown')}</span>
-                          </a>
-                        </div>
+                        <span className="text-[10px] text-[#D4AF37] font-semibold text-start sm:text-end truncate max-w-[210px] shrink-0">
+                          {project.region}
+                        </span>
                       </div>
 
-                      {/* Right Column (6 cols): Case Study Details */}
-                      <div className="lg:col-span-6 space-y-3.5 text-start">
-                        {/* Category & Region */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#D4AF37] flex items-center gap-1.5">
-                            {project.icon}
-                            {project.category}
-                          </span>
-                          <span className="text-white/20">•</span>
-                          <span className="text-[11px] font-mono text-[#9AA4BC]">{project.region}</span>
-                        </div>
+                      {/* Browser Viewport with Project Screenshot */}
+                      <div
+                        onClick={() => setPreviewImage(project.image)}
+                        className="relative aspect-[16/10] overflow-hidden bg-[#0A0D18] flex items-center justify-center cursor-zoom-in group/mockup"
+                        title="Click to view full screenshot"
+                      >
+                        <img
+                          src={project.image}
+                          alt={`${project.title} screenshot`}
+                          className={`w-full h-full ${project.imageFit || 'object-cover'} ${project.imagePosition || 'object-top'} transition-all duration-300 group-hover/mockup:scale-[1.02]`}
+                          style={project.objectPosition ? { objectPosition: project.objectPosition } : undefined}
+                          onError={(e) => {
+                            if (!e.currentTarget.dataset.fallbackTried) {
+                              e.currentTarget.dataset.fallbackTried = 'true';
+                              if (project.id === 'linguachat') {
+                                e.currentTarget.src = '/images/projects_image/linguaChat_AI2.png';
+                                return;
+                              }
+                              if (project.id === 'ecommerce') {
+                                e.currentTarget.src = '/images/projects_image/e-commerce_website.png';
+                                return;
+                              }
+                            }
+                          }}
+                        />
 
-                        {/* Title */}
-                        <h3 className="text-xl sm:text-2xl font-bold font-heading text-white">
-                          {project.title}
-                        </h3>
-
-                        {/* Challenge -> Architecture -> Impact */}
-                        <div className="space-y-2.5 text-xs font-sans pt-1">
-                          {/* CHALLENGE */}
-                          <div className="px-3.5 py-2.5 rounded-xl bg-[#070A12]/80 border border-white/5 space-y-1">
-                            <span className="text-[10px] font-mono font-bold uppercase text-[#FF3D8B] tracking-wider block">
-                              CHALLENGE
-                            </span>
-                            <p className="text-[#9AA4BC] text-xs leading-relaxed font-sans">
-                              {project.problem}
-                            </p>
-                          </div>
-
-                          {/* ARCHITECTURE */}
-                          <div className="px-3.5 py-2.5 rounded-xl bg-[#070A12]/80 border border-white/5 space-y-1">
-                            <span className="text-[10px] font-mono font-bold uppercase text-[#D4AF37] tracking-wider block">
-                              ARCHITECTURE
-                            </span>
-                            <p className="text-[#9AA4BC] text-xs leading-relaxed font-sans">
-                              {project.solution}
-                            </p>
-                          </div>
-
-                          {/* IMPACT */}
-                          <div className="px-3.5 py-2.5 rounded-xl bg-[#10B981]/5 border border-[#10B981]/20 space-y-1">
-                            <span className="text-[10px] font-mono font-bold uppercase text-[#10B981] tracking-wider block">
-                              IMPACT
-                            </span>
-                            <p className="text-[#cbd5e1] text-xs leading-relaxed font-sans">
-                              {project.result}
-                            </p>
-                          </div>
+                        {/* Subtle Expand Indicator */}
+                        <div className="absolute bottom-2.5 end-2.5 p-1.5 rounded-lg bg-[#070A12]/80 border border-white/10 text-[#D4AF37] opacity-0 group-hover/mockup:opacity-100 transition-opacity flex items-center gap-1 text-[10px] font-mono shadow-md backdrop-blur-sm pointer-events-none">
+                          <FiMaximize2 size={12} />
+                          <span>Full View</span>
                         </div>
                       </div>
                     </div>
-                  </GlassCard>
-                </Reveal>
-          ))}
-              </div>
-            </div>
 
-      {/* Full-Screen Image Lightbox / Modal */ }
-            < AnimatePresence >
-            { previewImage && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setPreviewImage(null)}
-                className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-4 sm:p-8 flex items-center justify-center cursor-zoom-out"
-              >
-                <button
-                  onClick={() => setPreviewImage(null)}
-                  className="absolute top-5 end-5 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors cursor-pointer"
-                  aria-label="Close preview"
-                >
-                  <FiX size={24} />
-                </button>
-                <motion.img
-                  initial={{ scale: 0.95 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0.95 }}
-                  src={previewImage}
-                  alt="Project screenshot full view"
-                  className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl border border-white/10 select-none"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </motion.div>
-            )}
-        </AnimatePresence>
+                    {/* Tech Stack Chips */}
+                    <div className="space-y-1.5 pt-1">
+                      <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-[#9AA4BC]/80 block">
+                        Technologies Used
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {project.stack.map((tech) => (
+                          <span
+                            key={tech}
+                            className="px-2.5 py-1 rounded-lg bg-[#141A2B] border border-white/10 text-[11px] font-mono text-[#F4F6FB]"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="pt-1 flex flex-wrap items-center gap-2.5">
+                      {project.live ? (
+                        <a
+                          href={project.live}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-heading font-semibold text-xs bg-gradient-to-r from-[#D4AF37] to-[#F5E6A8] text-[#070A12] hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:scale-105 transition-all cursor-pointer"
+                        >
+                          <span>{t('work.visitSite', 'Visit live site')}</span>
+                          <FiExternalLink size={13} />
+                        </a>
+                      ) : null}
+
+                      <a
+                        href="#architecture"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-heading font-medium text-xs text-[#9AA4BC] hover:text-white border border-white/10 hover:border-[#D4AF37]/40 bg-[#0E1320] transition-colors"
+                      >
+                        <FiLayers size={13} className="text-[#22D3EE]" />
+                        <span>{t('projects.viewArchitecture', 'Architecture Breakdown')}</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* Right Column (6 cols): Case Study Details */}
+                  <div className="lg:col-span-6 space-y-3.5 text-start">
+                    {/* Category & Region */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#D4AF37] flex items-center gap-1.5">
+                        {project.icon}
+                        {project.category}
+                      </span>
+                      <span className="text-white/20">•</span>
+                      <span className="text-[11px] font-mono text-[#9AA4BC]">{project.region}</span>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-xl sm:text-2xl font-bold font-heading text-white">
+                      {project.title}
+                    </h3>
+
+                    {/* Challenge -> Architecture -> Impact */}
+                    <div className="space-y-2.5 text-xs font-sans pt-1">
+                      {/* CHALLENGE */}
+                      <div className="px-3.5 py-2.5 rounded-xl bg-[#070A12]/80 border border-white/5 space-y-1">
+                        <span className="text-[10px] font-mono font-bold uppercase text-[#FF3D8B] tracking-wider block">
+                          CHALLENGE
+                        </span>
+                        <p className="text-[#9AA4BC] text-xs leading-relaxed font-sans">
+                          {project.problem}
+                        </p>
+                      </div>
+
+                      {/* ARCHITECTURE */}
+                      <div className="px-3.5 py-2.5 rounded-xl bg-[#070A12]/80 border border-white/5 space-y-1">
+                        <span className="text-[10px] font-mono font-bold uppercase text-[#D4AF37] tracking-wider block">
+                          ARCHITECTURE
+                        </span>
+                        <p className="text-[#9AA4BC] text-xs leading-relaxed font-sans">
+                          {project.solution}
+                        </p>
+                      </div>
+
+                      {/* IMPACT */}
+                      <div className="px-3.5 py-2.5 rounded-xl bg-[#10B981]/5 border border-[#10B981]/20 space-y-1">
+                        <span className="text-[10px] font-mono font-bold uppercase text-[#10B981] tracking-wider block">
+                          IMPACT
+                        </span>
+                        <p className="text-[#cbd5e1] text-xs leading-relaxed font-sans">
+                          {project.result}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </GlassCard>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+
+      {/* Full-Screen Image Lightbox / Modal */}
+      < AnimatePresence >
+        {previewImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setPreviewImage(null)}
+            className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md p-4 sm:p-8 flex items-center justify-center cursor-zoom-out"
+          >
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-5 end-5 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors cursor-pointer"
+              aria-label="Close preview"
+            >
+              <FiX size={24} />
+            </button>
+            <motion.img
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              src={previewImage}
+              alt="Project screenshot full view"
+              className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl border border-white/10 select-none"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
