@@ -249,11 +249,17 @@ export default function CVSection() {
                       className="relative w-full h-[420px] sm:h-[540px] rounded-2xl overflow-hidden bg-[#0A0D18] border border-white/10 shadow-2xl group/viewer cursor-pointer"
                       title="Click to view full preview"
                     >
-                      <iframe
-                        src={`${previewCvPath}#toolbar=0&navpanes=0&view=FitH`}
-                        title="Adnan Muhammed CV Preview"
-                        className="w-full h-full border-0 hidden sm:block pointer-events-none"
-                      />
+                      <object
+                        data={`${previewCvPath}#toolbar=0&navpanes=0&view=FitH`}
+                        type="application/pdf"
+                        className="w-full h-full hidden sm:block pointer-events-none"
+                      >
+                        <iframe
+                          src={`${previewCvPath}#toolbar=0&navpanes=0&view=FitH`}
+                          title="Adnan Muhammed CV Preview"
+                          className="w-full h-full border-0 hidden sm:block pointer-events-none"
+                        />
+                      </object>
 
                       {/* Hover Action Overlay - No backdrop-blur to prevent GPU text blur */}
                       <div className="absolute inset-0 bg-black/55 opacity-0 group-hover/viewer:opacity-100 transition-opacity hidden sm:flex items-center justify-center gap-3">
@@ -404,30 +410,36 @@ export default function CVSection() {
               </div>
 
               {/* Modal PDF Viewport with internal scroll */}
-              <div className="flex-1 w-full h-full bg-[#0E1320] overflow-hidden">
-                <iframe
-                  src={`${previewCvPath}#view=FitH&toolbar=1`}
-                  title="Adnan Muhammed CV"
-                  className="w-full h-full border-0"
-                />
-              </div>
+                <div className="flex-1 w-full h-full bg-[#0E1320] overflow-hidden relative">
+                  <object
+                    data={`${previewCvPath}#view=FitH&toolbar=1`}
+                    type="application/pdf"
+                    className="w-full h-full"
+                  >
+                    <iframe
+                      src={`${previewCvPath}#view=FitH&toolbar=1`}
+                      title="Adnan Muhammed CV"
+                      className="w-full h-full border-0"
+                    />
+                  </object>
+                </div>
 
-              {/* Modal Bottom Bar - Replaces blank bottom space with thumb-friendly controls */}
-              <div className="px-4 py-2.5 bg-[#141A2B] border-t border-white/10 flex items-center justify-between text-xs font-mono text-[#9AA4BC] shrink-0">
-                <span className="flex items-center gap-1.5 text-[#10B981] text-[11px]">
-                  <FiShield size={13} className="shrink-0" />
-                  <span>{t('cvSection.format', 'FORMAT: PDF · PRINT & ATS OPTIMIZED')}</span>
-                </span>
-                <a
-                  href={downloadCvPath}
-                  download="Adnan-Muhammed-CV.pdf"
-                  onClick={handleDownload}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#D4AF37] text-[#070A12] font-heading font-bold text-xs hover:brightness-110 transition-all cursor-pointer shadow-sm"
-                >
-                  <FiDownload size={12} />
-                  <span>Download PDF</span>
-                </a>
-              </div>
+                {/* Modal Bottom Bar - Replaces blank bottom space with thumb-friendly controls */}
+                <div className="px-4 py-2.5 bg-[#141A2B] border-t border-white/10 flex items-center justify-between text-xs font-mono text-[#9AA4BC] shrink-0">
+                  <span className="flex items-center gap-1.5 text-[#10B981] text-[11px]">
+                    <FiShield size={13} className="shrink-0" />
+                    <span>{t('cvSection.format', 'FORMAT: PDF · PRINT & ATS OPTIMIZED')}</span>
+                  </span>
+                  <a
+                    href={downloadCvPath}
+                    download="Adnan-Muhammed-CV.pdf"
+                    onClick={handleDownload}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#D4AF37] text-[#070A12] font-heading font-bold text-xs hover:brightness-110 transition-all cursor-pointer shadow-sm"
+                  >
+                    <FiDownload size={12} />
+                    <span>Download PDF</span>
+                  </a>
+                </div>
             </motion.div>
           </motion.div>
         )
