@@ -1,0 +1,30 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Ultra-Luminous Electric Lime Glow Filter -->
+    <filter id="neonGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="28" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- 100% Bright Electric Lime (#B5FE19) -->
+    <radialGradient id="pureLuminousLime" cx="42%" cy="38%" r="62%">
+      <stop offset="0%" stop-color="#FAFFE6" />
+      <stop offset="25%" stop-color="#D8FF5C" />
+      <stop offset="65%" stop-color="#B5FE19" />
+      <stop offset="100%" stop-color="#9DEB05" />
+    </radialGradient>
+  </defs>
+
+  <!-- Radiant Outer Aura Halo for Eye-Catching Pop -->
+  <circle cx="256" cy="256" r="215" fill="#B5FE19" opacity="0.45" filter="url(#neonGlow)" />
+
+  <!-- Pure High-Luminance Solid Neon Circle -->
+  <circle cx="256" cy="256" r="185" fill="url(#pureLuminousLime)" />
+
+  <!-- Crisp Core Center Light Flare -->
+  <circle cx="220" cy="210" r="45" fill="#FFFFFF" opacity="0.65" />
+  <circle cx="220" cy="210" r="20" fill="#FFFFFF" opacity="0.95" />
+</svg>

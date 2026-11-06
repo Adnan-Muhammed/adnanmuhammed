@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+# Sitemap URL will be added here after Vercel deployment:
+# Sitemap: https://your-portfolio.vercel.app/sitemap.xml
