@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import {
   FiMail,
   FiSend,
@@ -8,9 +7,11 @@ import {
   FiMapPin,
   FiCheckCircle,
   FiAlertCircle,
-  FiArrowUpRight
+  FiArrowUpRight,
+  FiLoader
 } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
+import emailjs from '@emailjs/browser';
 import { openProtectedWhatsApp } from '../utils/safeContact';
 import { useLanguage } from '../i18n';
 import { SectionTitle } from './ui/SectionTitle';
@@ -28,22 +29,75 @@ export default function Contact() {
   });
   const [honeypot, setHoneypot] = useState('');
   const [status, setStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (honeypot) {
       setStatus('success');
+      setFormData({
+        name: '',
+        email: '',
+        subject: 'Full-Stack Developer Role',
+        message: '',
+      });
       return;
     }
 
     setStatus('submitting');
+    setErrorMessage('');
 
-    // Simulate prompt dispatch or submit to endpoint if configured
-    try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setStatus('success');
-    } catch {
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    // Guard: Check if actual EmailJS credentials have been configured
+    const isConfigured =
+      serviceId &&
+      templateId &&
+      publicKey &&
+      serviceId !== 'your_service_id_here' &&
+      templateId !== 'your_template_id_here' &&
+      publicKey !== 'your_public_key_here';
+
+    if (!isConfigured) {
+      console.warn('EmailJS environment variables are not configured in .env');
       setStatus('error');
+      setErrorMessage(
+        t(
+          'contact.errorNotConfigured',
+          'EmailJS is not configured yet. Please add your actual credentials in the .env file and restart the dev server (npm run dev).'
+        )
+      );
+      return;
+    }
+
+    try {
+      const templateParams = {
+        from_name: formData.name.trim(),
+        reply_to: formData.email.trim(),
+        message: formData.message.trim(),
+        subject: formData.subject,
+      };
+
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+
+      setStatus('success');
+      // Clear form inputs after successful submission
+      setFormData({
+        name: '',
+        email: '',
+        subject: 'Full-Stack Developer Role',
+        message: '',
+      });
+    } catch (error) {
+      console.error('EmailJS submission error:', error);
+      setStatus('error');
+      setErrorMessage(
+        error?.text ||
+        error?.message ||
+        t('contact.errorDesc', 'Unable to send message. Please verify your EmailJS credentials or try again later.')
+      );
     }
   };
 
@@ -54,6 +108,7 @@ export default function Contact() {
       subject: 'Full-Stack Developer Role',
       message: '',
     });
+    setErrorMessage('');
     setStatus('idle');
   };
 
@@ -68,18 +123,18 @@ export default function Contact() {
             eyebrow={t('contact.badge', 'Get in Touch')}
             title={
               lang === 'ar' ? (
-          <>
-            تواصل لبدء{' '}
-            <span className="gold-gradient-text">العمل الهندسي</span>
-          </>
-          ) : (
-          <>
-            Let&apos;s Build Something{' '}
-            <span className="gold-gradient-text">Resilient</span>
-          </>
-          )
+                <>
+                  تواصل لبدء{' '}
+                  <span className="gold-gradient-text">العمل الهندسي</span>
+                </>
+              ) : (
+                <>
+                  Let&apos;s Build Something{' '}
+                  <span className="gold-gradient-text">Resilient</span>
+                </>
+              )
             }
-          subtitle={t('contact.subtitle', 'Available for full-time Full-Stack, Backend Engineering, and Cloud/DevOps opportunities. Let us connect.')}
+            subtitle={t('contact.subtitle', 'Available for full-time Full-Stack, Backend Engineering, and Cloud/DevOps opportunities. Let us connect.')}
           />
         </Reveal>
 
@@ -233,23 +288,42 @@ export default function Contact() {
                       </p>
                       <button
                         onClick={handleReset}
-                        className="btn-cyber-secondary text-xs px-6 py-2.5 mt-2"
+                        className="btn-cyber-secondary text-xs px-6 py-2.5 mt-2 cursor-pointer"
                       >
                         {t('contact.sendAnother', 'Send Another Message')}
                       </button>
                     </div>
                   ) : (
                     <form onSubmit={handleSubmit} className="pt-5 flex-1 flex flex-col justify-between gap-4">
-                      {/* Honeypot anti-spam */}
-                      <input
-                        type="text"
-                        name="company_website"
-                        value={honeypot}
-                        onChange={(e) => setHoneypot(e.target.value)}
-                        className="hidden"
-                        tabIndex="-1"
-                        autoComplete="off"
-                      />
+                      {/* Honeypot anti-spam (off-screen, invisible to users & ignored by autofill) */}
+                      <div className="absolute opacity-0 pointer-events-none -z-50 h-0 w-0 overflow-hidden" aria-hidden="true">
+                        <input
+                          type="text"
+                          name="_security_honeypot_field"
+                          value={honeypot}
+                          onChange={(e) => setHoneypot(e.target.value)}
+                          tabIndex="-1"
+                          autoComplete="new-password"
+                        />
+                      </div>
+
+                      {/* Error Alert Banner */}
+                      {status === 'error' && (
+                        <div
+                          role="alert"
+                          className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-start gap-3"
+                        >
+                          <FiAlertCircle className="text-lg flex-shrink-0 mt-0.5 text-red-400" />
+                          <div className="flex-1">
+                            <div className="font-semibold text-red-300">
+                              {t('contact.errorTitle', 'Message Delivery Failed')}
+                            </div>
+                            <div className="text-xs text-red-300/80 mt-1 leading-relaxed">
+                              {errorMessage || t('contact.errorDesc', 'Unable to send message. Please verify your EmailJS credentials or try again later.')}
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Name */}
@@ -261,10 +335,11 @@ export default function Contact() {
                             dir="ltr"
                             type="text"
                             required
+                            disabled={status === 'submitting'}
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder={t('contact.namePlaceholder', "What's your name?")}
-                            className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors text-left"
+                            className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors text-left disabled:opacity-50"
                           />
                         </div>
 
@@ -277,10 +352,11 @@ export default function Contact() {
                             dir="ltr"
                             type="email"
                             required
+                            disabled={status === 'submitting'}
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             placeholder={t('contact.emailPlaceholder', "What's your email?")}
-                            className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors text-left"
+                            className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors text-left disabled:opacity-50"
                           />
                         </div>
                       </div>
@@ -292,9 +368,10 @@ export default function Contact() {
                         </label>
                         <select
                           dir="ltr"
+                          disabled={status === 'submitting'}
                           value={formData.subject}
                           onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors text-left cursor-pointer"
+                          className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors text-left cursor-pointer disabled:opacity-50"
                         >
                           <option value="Full-Stack Developer Role">Full-Stack Developer Role (MERN / Next.js)</option>
                           <option value="Backend Engineer Opportunity">Backend Engineer Opportunity (Node.js / Express)</option>
@@ -311,11 +388,12 @@ export default function Contact() {
                         <textarea
                           dir="ltr"
                           required
+                          disabled={status === 'submitting'}
                           rows="5"
                           value={formData.message}
                           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                           placeholder={t('contact.messagePlaceholder', "What would you like to say? Tell me about the role, team, or project...")}
-                          className="w-full flex-1 min-h-[140px] px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors resize-none text-left"
+                          className="w-full flex-1 min-h-[140px] px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors resize-none text-left disabled:opacity-50"
                         />
                       </div>
 
@@ -324,10 +402,19 @@ export default function Contact() {
                         <button
                           type="submit"
                           disabled={status === 'submitting'}
-                          className="btn-cyber-primary w-full justify-center py-3.5 shadow-lg disabled:opacity-50 cursor-pointer"
+                          className="btn-cyber-primary w-full justify-center py-3.5 shadow-lg disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
                         >
-                          <FiSend size={15} />
-                          <span>{status === 'submitting' ? t('contact.submittingBtn', 'Sending...') : t('contact.submitBtn', 'Send Message')}</span>
+                          {status === 'submitting' ? (
+                            <>
+                              <FiLoader className="animate-spin text-base" />
+                              <span>{t('contact.submittingBtn', 'Sending...')}</span>
+                            </>
+                          ) : (
+                            <>
+                              <FiSend size={15} />
+                              <span>{t('contact.submitBtn', 'Send Message')}</span>
+                            </>
+                          )}
                         </button>
                       </div>
                     </form>
