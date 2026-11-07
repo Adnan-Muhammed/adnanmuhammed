@@ -13,3 +13,16 @@ export const openProtectedWhatsApp = () => {
   }
 };
 
+export const openFollowUpWhatsApp = (customText) => {
+  try {
+    if (typeof window !== 'undefined') {
+      const phone = window.atob("OTE5Nzc4NzY5MDcw");
+      const text = customText || "Hi Adnan, I recently sent an inquiry through your portfolio and would like to connect directly on WhatsApp.";
+      const target = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+      window.open(target, '_blank', 'noopener,noreferrer');
+    }
+  } catch (err) {
+    console.error('Error opening chat', err);
+  }
+};
+

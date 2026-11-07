@@ -12,11 +12,13 @@ import {
 } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 import emailjs from '@emailjs/browser';
-import { openProtectedWhatsApp } from '../utils/safeContact';
+import { openProtectedWhatsApp, openFollowUpWhatsApp } from '../utils/safeContact';
 import { useLanguage } from '../i18n';
 import { SectionTitle } from './ui/SectionTitle';
 import { GlassCard } from './ui/GlassCard';
 import { Reveal } from './ui/Reveal';
+
+const COOLDOWN_DURATION = 24 * 60 * 60 * 1000; // 24 hours cooldown to protect EmailJS quota
 
 export default function Contact() {
   const { t, lang } = useLanguage();
@@ -30,6 +32,23 @@ export default function Contact() {
   const [honeypot, setHoneypot] = useState('');
   const [status, setStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
   const [errorMessage, setErrorMessage] = useState('');
+  const [dispatchStep, setDispatchStep] = useState('idle'); // 'idle' | 'encrypting' | 'routing'
+  const [activeToken, setActiveToken] = useState('');
+
+  // Check 24-hour rate limit from localStorage
+  const [cooldown, setCooldown] = useState(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const raw = localStorage.getItem('spc_last_contact');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      const isRecent = Date.now() - parsed.timestamp < COOLDOWN_DURATION;
+      return isRecent ? parsed : null;
+    } catch {
+      return null;
+    }
+  });
+  const [bypassCooldown, setBypassCooldown] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,6 +65,7 @@ export default function Contact() {
 
     setStatus('submitting');
     setErrorMessage('');
+    setDispatchStep('encrypting');
 
     const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
     const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
@@ -73,17 +93,39 @@ export default function Contact() {
     }
 
     try {
+      const generatedToken = `AM-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+
+      // Micro cyber dispatch progression
+      await new Promise((resolve) => setTimeout(resolve, 450));
+      setDispatchStep('routing');
+
       const templateParams = {
         from_name: formData.name.trim(),
         reply_to: formData.email.trim(),
         message: formData.message.trim(),
         subject: formData.subject,
+        title: formData.subject,
       };
 
       // Trigger EmailJS (Sends Contact Us inquiry and automatically triggers linked Auto-Reply)
       await emailjs.send(serviceId, templateId, templateParams, publicKey);
 
+      // Save submission record in localStorage to protect quota on repeat visits
+      const record = {
+        timestamp: Date.now(),
+        token: generatedToken,
+        name: formData.name.trim(),
+      };
+      try {
+        localStorage.setItem('spc_last_contact', JSON.stringify(record));
+      } catch {
+        // Ignore storage write issues
+      }
+
+      setActiveToken(generatedToken);
+      setCooldown(record);
       setStatus('success');
+
       // Clear form inputs after successful submission
       setFormData({
         name: '',
@@ -111,6 +153,7 @@ export default function Contact() {
     });
     setErrorMessage('');
     setStatus('idle');
+    setBypassCooldown(true);
   };
 
   return (
@@ -276,26 +319,111 @@ export default function Contact() {
                     </span>
                   </div>
 
-                  {status === 'success' ? (
-                    <div className="py-12 text-center space-y-4 my-auto">
-                      <div className="w-16 h-16 rounded-full bg-[#10B981]/20 text-[#10B981] flex items-center justify-center mx-auto text-3xl">
+                  {cooldown && !bypassCooldown && status !== 'success' ? (
+                    <div className="py-8 text-center space-y-5 my-auto flex-1 flex flex-col justify-center">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10B981]/10 border border-[#10B981]/30 text-xs font-mono text-[#10B981] mx-auto">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                        <span>{t('contact.cooldownBadge', 'Inquiry Already Active')}</span>
+                        {cooldown.token && <span className="opacity-70">#{cooldown.token}</span>}
+                      </div>
+
+                      <div className="w-16 h-16 rounded-2xl bg-[#10B981]/15 text-[#10B981] flex items-center justify-center mx-auto text-3xl shadow-[0_0_25px_rgba(16,185,129,0.2)] border border-[#10B981]/30">
+                        <FaWhatsapp />
+                      </div>
+
+                      <div className="space-y-2 max-w-md mx-auto">
+                        <h3 className="text-xl sm:text-2xl font-bold font-heading text-white dark:text-white light:text-slate-900">
+                          {t('contact.cooldownTitle', 'Message Previously Dispatched')}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-[#9AA4BC] dark:text-[#9AA4BC] light:text-slate-600 leading-relaxed">
+                          {cooldown.name ? `Hi ${cooldown.name}! ` : ''}
+                          {t(
+                            'contact.cooldownDesc',
+                            'Your recent message has already reached my inbox. To discuss immediately or bypass email wait times, connect directly on WhatsApp.'
+                          )}
+                        </p>
+                      </div>
+
+                      <div className="pt-2 max-w-sm mx-auto w-full space-y-3">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openFollowUpWhatsApp(
+                              `Hi Adnan, following up on my portfolio inquiry${cooldown.token ? ` (Ref: #${cooldown.token})` : ''} regarding a role/project.`
+                            )
+                          }
+                          className="btn-cyber-primary w-full justify-center py-3.5 shadow-lg flex items-center gap-2.5 text-sm cursor-pointer"
+                        >
+                          <FaWhatsapp className="text-lg text-[#10B981]" />
+                          <span>{t('contact.cooldownWhatsAppBtn', 'Fast-Track Chat on WhatsApp')}</span>
+                          <FiArrowUpRight className="text-xs opacity-70 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </button>
+
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => setBypassCooldown(true)}
+                            className="text-xs text-[#9AA4BC] hover:text-[#D4AF37] underline underline-offset-4 transition-colors cursor-pointer"
+                          >
+                            {t('contact.cooldownBypassBtn', 'Need to send an alternate inquiry? Click here')}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : status === 'success' ? (
+                    <div className="py-8 text-center space-y-4 my-auto flex-1 flex flex-col justify-center">
+                      <div className="w-16 h-16 rounded-full bg-[#10B981]/20 text-[#10B981] flex items-center justify-center mx-auto text-3xl shadow-[0_0_20px_rgba(16,185,129,0.3)]">
                         <FiCheckCircle />
                       </div>
-                      <h3 className="text-2xl font-bold font-heading text-white dark:text-white light:text-slate-900">
-                        {t('contact.successTitle', 'Message Dispatched')}
-                      </h3>
-                      <p className="text-sm text-[#9AA4BC] dark:text-[#9AA4BC] light:text-slate-600 max-w-md mx-auto">
-                        {t('contact.successDesc', 'Thank you! Your message has been received. I will respond to your email promptly.')}
-                      </p>
-                      <button
-                        onClick={handleReset}
-                        className="btn-cyber-secondary text-xs px-6 py-2.5 mt-2 cursor-pointer"
-                      >
-                        {t('contact.sendAnother', 'Send Another Message')}
-                      </button>
+
+                      <div className="space-y-1.5">
+                        {(activeToken || cooldown?.token) && (
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-xs font-mono text-[#D4AF37]">
+                            <span>REF: #{activeToken || cooldown?.token}</span>
+                          </div>
+                        )}
+                        <h3 className="text-2xl font-bold font-heading text-white dark:text-white light:text-slate-900">
+                          {t('contact.successTitle', 'Message Dispatched')}
+                        </h3>
+                        <p className="text-sm text-[#9AA4BC] dark:text-[#9AA4BC] light:text-slate-600 max-w-md mx-auto">
+                          {t('contact.successDesc', 'Thank you! Your message has been received. I will respond to your email promptly.')}
+                        </p>
+                        <p className="text-xs font-mono text-[#10B981] flex items-center justify-center gap-1.5 pt-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                          {t('contact.expectedResponse', 'Expected response within 4–12 hours')}
+                        </p>
+                      </div>
+
+                      <div className="pt-2 max-w-sm mx-auto w-full space-y-2.5">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            openFollowUpWhatsApp(
+                              `Hi Adnan, I just submitted an inquiry via your portfolio${activeToken ? ` (Ref: #${activeToken})` : ''} and am connecting here as well.`
+                            )
+                          }
+                          className="w-full p-3 rounded-xl bg-[#10B981]/10 border border-[#10B981]/30 hover:border-[#10B981]/60 text-xs text-[#10B981] font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer group"
+                        >
+                          <FaWhatsapp className="text-base group-hover:scale-110 transition-transform" />
+                          <span>{t('contact.fastTrackPrompt', 'Prefer an immediate turnaround? Connect on WhatsApp')} &rarr;</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleReset}
+                          className="btn-cyber-secondary text-xs px-6 py-2.5 w-full cursor-pointer"
+                        >
+                          {t('contact.sendAnother', 'Send Another Message')}
+                        </button>
+                      </div>
                     </div>
                   ) : (
-                    <form onSubmit={handleSubmit} className="pt-5 flex-1 flex flex-col justify-between gap-4">
+                    <form onSubmit={handleSubmit} className="pt-5 flex-1 flex flex-col justify-between gap-4 relative">
+                      {/* Top Cyber Dispatch Shimmer Bar */}
+                      {status === 'submitting' && (
+                        <div className="absolute -top-5 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent animate-pulse" />
+                      )}
+
                       {/* Honeypot anti-spam (off-screen, invisible to users & ignored by autofill) */}
                       <div className="absolute opacity-0 pointer-events-none -z-50 h-0 w-0 overflow-hidden" aria-hidden="true">
                         <input
@@ -340,7 +468,7 @@ export default function Contact() {
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             placeholder={t('contact.namePlaceholder', "What's your name?")}
-                            className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors text-left disabled:opacity-50"
+                            className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.15)] transition-all duration-200 text-left disabled:opacity-50"
                           />
                         </div>
 
@@ -357,7 +485,7 @@ export default function Contact() {
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             placeholder={t('contact.emailPlaceholder', "What's your email?")}
-                            className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors text-left disabled:opacity-50"
+                            className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.15)] transition-all duration-200 text-left disabled:opacity-50"
                           />
                         </div>
                       </div>
@@ -372,7 +500,7 @@ export default function Contact() {
                           disabled={status === 'submitting'}
                           value={formData.subject}
                           onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors text-left cursor-pointer disabled:opacity-50"
+                          className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 transition-all duration-200 text-left cursor-pointer disabled:opacity-50"
                         >
                           <option value="Full-Stack Developer Role">Full-Stack Developer Role (MERN / Next.js)</option>
                           <option value="Backend Engineer Opportunity">Backend Engineer Opportunity (Node.js / Express)</option>
@@ -394,21 +522,25 @@ export default function Contact() {
                           value={formData.message}
                           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                           placeholder={t('contact.messagePlaceholder', "What would you like to say? Tell me about the role, team, or project...")}
-                          className="w-full flex-1 min-h-[140px] px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] transition-colors resize-none text-left disabled:opacity-50"
+                          className="w-full flex-1 min-h-[140px] px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.15)] transition-all duration-200 resize-none text-left disabled:opacity-50"
                         />
                       </div>
 
-                      {/* Submit Button */}
+                      {/* Submit Button with Live Cyber Steps */}
                       <div className="pt-1">
                         <button
                           type="submit"
                           disabled={status === 'submitting'}
-                          className="btn-cyber-primary w-full justify-center py-3.5 shadow-lg disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2"
+                          className="btn-cyber-primary w-full justify-center py-3.5 shadow-lg disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2 relative overflow-hidden group"
                         >
                           {status === 'submitting' ? (
                             <>
-                              <FiLoader className="animate-spin text-base" />
-                              <span>{t('contact.submittingBtn', 'Sending...')}</span>
+                              <FiLoader className="animate-spin text-base text-[#D4AF37]" />
+                              <span className="font-mono text-xs tracking-wide">
+                                {dispatchStep === 'encrypting'
+                                  ? t('contact.stepEncrypting', 'Encrypting payload...')
+                                  : t('contact.stepRouting', 'Routing via gateway...')}
+                              </span>
                             </>
                           ) : (
                             <>
