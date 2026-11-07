@@ -80,6 +80,7 @@ export default function Contact() {
         subject: formData.subject,
       };
 
+      // Trigger EmailJS (Sends Contact Us inquiry and automatically triggers linked Auto-Reply)
       await emailjs.send(serviceId, templateId, templateParams, publicKey);
 
       setStatus('success');
