@@ -11,6 +11,7 @@ export function TitleScreen({ onStart, onSkip }) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isTriggering, setIsTriggering] = useState(false);
   const dragTrackerRef = useRef({ startX: 0, startY: 0, hasDragged: false });
+  const isPointerDownRef = useRef(false);
 
   // Parallax mouse tracker (desktop)
   const handleMouseMove = useCallback((e) => {
@@ -24,6 +25,7 @@ export function TitleScreen({ onStart, onSkip }) {
   }, []);
 
   const handlePointerDown = (e) => {
+    isPointerDownRef.current = true;
     dragTrackerRef.current.startX = e.clientX;
     dragTrackerRef.current.startY = e.clientY;
     dragTrackerRef.current.hasDragged = false;
@@ -31,41 +33,45 @@ export function TitleScreen({ onStart, onSkip }) {
 
   const handlePointerMove = (e) => {
     handleMouseMove(e);
-    if (!dragTrackerRef.current.hasDragged && e.buttons > 0) {
-      const dist = Math.hypot(
-        e.clientX - dragTrackerRef.current.startX,
-        e.clientY - dragTrackerRef.current.startY
-      );
-      if (dist > 6) {
-        dragTrackerRef.current.hasDragged = true;
+      if (isPointerDownRef.current && !dragTrackerRef.current.hasDragged) {
+        const dist = Math.hypot(
+          e.clientX - dragTrackerRef.current.startX,
+          e.clientY - dragTrackerRef.current.startY
+        );
+        if (dist > 6) {
+          dragTrackerRef.current.hasDragged = true;
+        }
       }
-    }
-  };
+    };
 
-  const handleBackgroundClick = (e) => {
-    // If the user was dragging anywhere to rotate the globe, do not navigate!
-    if (dragTrackerRef.current.hasDragged) {
-      dragTrackerRef.current.hasDragged = false;
-      return;
-    }
-    // Clicking outside the globe portion triggers navigation
-    handlePressStart();
-  };
+    const handlePointerUp = () => {
+      isPointerDownRef.current = false;
+    };
 
-  const handleAudioToggle = (e) => {
-    e.stopPropagation();
-    const muted = cyberAudio.toggleMute();
-    setAudioMuted(muted);
-  };
+    const handleBackgroundClick = (e) => {
+      // If the user was dragging anywhere to rotate the globe, do not navigate!
+      if (dragTrackerRef.current.hasDragged) {
+        dragTrackerRef.current.hasDragged = false;
+        return;
+      }
+      // Clicking outside the globe portion triggers navigation
+      handlePressStart();
+    };
 
-  const handlePressStart = useCallback(() => {
-    if (isTriggering) return;
-    setIsTriggering(true);
-    cyberAudio.playCoin();
-    setTimeout(() => {
-      onStart();
-    }, 450);
-  }, [isTriggering, onStart]);
+    const handleAudioToggle = (e) => {
+      e.stopPropagation();
+      const muted = cyberAudio.toggleMute();
+      setAudioMuted(muted);
+    };
+
+    const handlePressStart = useCallback(() => {
+      if (isTriggering) return;
+      setIsTriggering(true);
+      cyberAudio.playCoin();
+      setTimeout(() => {
+        onStart();
+      }, 450);
+    }, [isTriggering, onStart]);
 
     // Keyboard navigation: Enter or Space triggers Start; Esc skips intro
     useEffect(() => {
@@ -82,17 +88,19 @@ export function TitleScreen({ onStart, onSkip }) {
       return () => window.removeEventListener('keydown', onKeyDown);
     }, [handlePressStart, onSkip]);
 
-  const firstName = 'ADNAN'.split('');
-  const lastName = 'MUHAMMED'.split('');
+    const firstName = 'ADNAN'.split('');
+    const lastName = 'MUHAMMED'.split('');
 
-  return (
-    <div
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onClick={handleBackgroundClick}
-      className={`relative w-full h-full flex flex-col justify-between bg-[#070A12] text-[#F4F6FB] overflow-hidden select-none touch-none cursor-default ${isTriggering ? 'animate-[shake_0.4s_ease-in-out]' : ''
-        }`}
-    >
+    return (
+      <div
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+        onClick={handleBackgroundClick}
+        className={`relative w-full h-full flex flex-col justify-between bg-[#070A12] text-[#F4F6FB] overflow-hidden select-none touch-none cursor-default ${isTriggering ? 'animate-[shake_0.4s_ease-in-out]' : ''
+          }`}
+      >
         {/* Layer 1: Atmospheric Aurora & Gradient Sky */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#070A12] via-[#0B0F1C] to-[#070A12] pointer-events-none" />
         <div
@@ -250,78 +258,78 @@ export function TitleScreen({ onStart, onSkip }) {
           </TechGlobe>
         </div>
 
-      {/* Bottom-Right Interactive Robot Assistant */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: [0, -8, 0] }}
-        transition={{
-          opacity: { delay: 0.6, duration: 0.6 },
-          scale: { delay: 0.6, duration: 0.6 },
-          y: { repeat: Infinity, duration: 3.5, ease: 'easeInOut' },
-        }}
-        className="absolute bottom-16 sm:bottom-20 right-4 sm:right-8 md:right-12 z-30 pointer-events-auto cursor-pointer group"
-        onClick={(e) => {
-          e.stopPropagation();
-          handlePressStart();
-        }}
-        title="AI Bot — Coming Soon"
-      >
-        {/* Floating Tooltip: Appears ONLY on mouse touch/hover */}
-        <div className="absolute -top-11 sm:-top-12 -left-20 sm:-left-24 bg-[#0E1320]/95 backdrop-blur-md border border-[#D4AF37]/50 px-3 py-1.5 rounded-2xl shadow-[0_8px_25px_rgba(0,0,0,0.6)] flex items-center gap-2 pointer-events-none whitespace-nowrap z-40 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]" />
-          </span>
-          <span className="text-[11px] font-sans font-medium text-white flex items-center gap-1.5">
-            <span>AI Bot</span>
-            <span className="text-[#9AA4BC]">•</span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/30 font-semibold tracking-wide">
-              Coming Soon
+        {/* Bottom-Right Interactive Robot Assistant */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: [0, -8, 0] }}
+          transition={{
+            opacity: { delay: 0.6, duration: 0.6 },
+            scale: { delay: 0.6, duration: 0.6 },
+            y: { repeat: Infinity, duration: 3.5, ease: 'easeInOut' },
+          }}
+          className="absolute bottom-16 sm:bottom-20 right-4 sm:right-8 md:right-12 z-30 pointer-events-auto cursor-pointer group"
+          onClick={(e) => {
+            e.stopPropagation();
+            handlePressStart();
+          }}
+          title="AI Bot — Coming Soon"
+        >
+          {/* Floating Tooltip: Appears ONLY on mouse touch/hover */}
+          <div className="absolute -top-11 sm:-top-12 -left-20 sm:-left-24 bg-[#0E1320]/95 backdrop-blur-md border border-[#D4AF37]/50 px-3 py-1.5 rounded-2xl shadow-[0_8px_25px_rgba(0,0,0,0.6)] flex items-center gap-2 pointer-events-none whitespace-nowrap z-40 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]" />
             </span>
-          </span>
-          {/* Bubble tail arrow */}
-          <div className="absolute -bottom-1.5 right-6 w-2.5 h-2.5 bg-[#0E1320] border-r border-b border-[#D4AF37]/50 rotate-45 transform" />
-        </div>
+            <span className="text-[11px] font-sans font-medium text-white flex items-center gap-1.5">
+              <span>AI Bot</span>
+              <span className="text-[#9AA4BC]">•</span>
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/30 font-semibold tracking-wide">
+                Coming Soon
+              </span>
+            </span>
+            {/* Bubble tail arrow */}
+            <div className="absolute -bottom-1.5 right-6 w-2.5 h-2.5 bg-[#0E1320] border-r border-b border-[#D4AF37]/50 rotate-45 transform" />
+          </div>
 
-        {/* Robot Figure Container */}
-        <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 transition-transform duration-300 group-hover:scale-105">
-          {/* Golden Warm Glow Aura */}
-          <div className="absolute inset-1 bg-gradient-to-tr from-[#D4AF37]/35 via-[#F5E6A8]/25 to-[#D4AF37]/40 rounded-full blur-2xl pointer-events-none group-hover:opacity-100 opacity-70 transition-opacity" />
-          <div
-            className="w-full h-full relative z-10"
-            style={{
-              filter: 'hue-rotate(28deg) saturate(1.3) brightness(1.08) drop-shadow(0 4px 24px rgba(212, 175, 55, 0.4))'
-            }}
-          >
-            <DotLottieReact
-              src="/animations/lottiefile_robo.lottie"
-              loop
-              autoplay
-              className="w-full h-full"
-            />
+          {/* Robot Figure Container */}
+          <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-44 lg:h-44 transition-transform duration-300 group-hover:scale-105">
+            {/* Golden Warm Glow Aura */}
+            <div className="absolute inset-1 bg-gradient-to-tr from-[#D4AF37]/35 via-[#F5E6A8]/25 to-[#D4AF37]/40 rounded-full blur-2xl pointer-events-none group-hover:opacity-100 opacity-70 transition-opacity" />
+            <div
+              className="w-full h-full relative z-10"
+              style={{
+                filter: 'hue-rotate(28deg) saturate(1.3) brightness(1.08) drop-shadow(0 4px 24px rgba(212, 175, 55, 0.4))'
+              }}
+            >
+              <DotLottieReact
+                src="/animations/lottiefile_robo.lottie"
+                loop
+                autoplay
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Bottom HUD: Audio & Status */}
+        <div dir="ltr" className="relative z-20 px-6 pb-6 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#9AA4BC] border-t border-white/5 pt-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleAudioToggle}
+              className="p-2 rounded-full bg-[#0E1320] border border-[#D4AF37]/20 hover:border-[#D4AF37] text-[#D4AF37] transition-all flex items-center gap-1.5 px-3"
+              title={audioMuted ? 'Turn Sound ON' : 'Turn Sound OFF'}
+            >
+              {!audioMuted ? <FiVolume2 className="text-sm" /> : <FiVolumeX className="text-sm" />}
+              <span className="text-[10px] uppercase font-bold">{audioMuted ? 'SFX: OFF' : 'SFX: ON'}</span>
+            </button>
+          </div>
+
+          <div className="text-xs font-mono text-[#9AA4BC]">
+            <span>Open for Opportunities · Kerala, India &amp; Remote</span>
           </div>
         </div>
-      </motion.div>
-
-      {/* Bottom HUD: Audio & Status */}
-      <div dir="ltr" className="relative z-20 px-6 pb-6 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#9AA4BC] border-t border-white/5 pt-4">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleAudioToggle}
-            className="p-2 rounded-full bg-[#0E1320] border border-[#D4AF37]/20 hover:border-[#D4AF37] text-[#D4AF37] transition-all flex items-center gap-1.5 px-3"
-            title={audioMuted ? 'Turn Sound ON' : 'Turn Sound OFF'}
-          >
-            {!audioMuted ? <FiVolume2 className="text-sm" /> : <FiVolumeX className="text-sm" />}
-            <span className="text-[10px] uppercase font-bold">{audioMuted ? 'SFX: OFF' : 'SFX: ON'}</span>
-          </button>
-        </div>
-
-        <div className="text-xs font-mono text-[#9AA4BC]">
-          <span>Open for Opportunities · Kerala, India &amp; Remote</span>
-        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
-export default TitleScreen;
+  export default TitleScreen;

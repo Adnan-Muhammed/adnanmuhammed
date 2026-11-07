@@ -2,17 +2,38 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ParticleCanvas from './ParticleCanvas';
 
-const statusLines = [
-  'Initializing cloud infrastructure…',
-  'Connecting Docker container daemon…',
-  'Configuring WebRTC & Socket.IO signaling…',
-  'Ready player one.',
+// Production-focused status lines highlighting System Design, AI capabilities, databases, UI craftsmanship and versatility
+const statusLinesEn = [
+  'Architecting scalable system designs & cloud backends…',
+  'Integrating intelligent AI capabilities & modern tooling…',
+  'Optimizing high-performance databases & secure APIs…',
+  'Crafting responsive, pixel-perfect user experiences…',
+  'Versatile Full-Stack Engineer. Production-ready.',
+];
+
+const statusLinesAr = [
+  'تصميم معماريات الأنظمة والخدمات السحابية القابلة للتوسع…',
+  'دمج قدرات الذكاء الاصطناعي الذكية والأدوات الحديثة…',
+  'تحسين قواعد البيانات عالية الأداء وواجهات API الآمنة…',
+  'بناء واجهات مستخدم متجاوبة وتجارب رقمية متقنة…',
+  'مهندس برمجيات شامل ومتميز. جاهز للإنتاج.',
 ];
 
 export function BootLoader({ onComplete, isFast = false }) {
   const [progress, setProgress] = useState(0);
   const [lineIdx, setLineIdx] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [isAr, setIsAr] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('spc_lang');
+      const docLang = document.documentElement.lang;
+      setIsAr(stored === 'ar' || docLang === 'ar');
+    }
+  }, []);
+
+  const statusLines = isAr ? statusLinesAr : statusLinesEn;
 
   // Speed factor: 1.2s for returning visitors, 2.4s for fresh visits
   const durationMs = isFast ? 1200 : 2400;
@@ -40,15 +61,15 @@ export function BootLoader({ onComplete, isFast = false }) {
     }, 30);
 
     return () => clearInterval(interval);
-  }, [durationMs, onComplete]);
+  }, [durationMs, onComplete, statusLines]);
 
   return (
-    <div dir="ltr" className="relative w-full h-full flex flex-col items-center justify-center bg-[#070A12] text-[#F4F6FB] overflow-hidden select-none">
+    <div dir={isAr ? 'rtl' : 'ltr'} className="relative w-full h-full flex flex-col items-center justify-center bg-[#070A12] text-[#F4F6FB] overflow-hidden select-none">
       {/* Ambient Starfield Canvas */}
       <ParticleCanvas mode="boot" />
 
       {/* Center Monogram & Boot Loader Box */}
-      <div className="relative z-10 flex flex-col items-center max-w-sm w-full px-6 space-y-7">
+      <div className="relative z-10 flex flex-col items-center max-w-md w-full px-4 sm:px-6 space-y-7">
         {/* Gold "AM" Monogram SVG with stroke self-draw animation */}
         <div className="relative w-28 h-28 flex items-center justify-center">
           {/* Outer Glow Ring */}
@@ -104,7 +125,7 @@ export function BootLoader({ onComplete, isFast = false }) {
             ADNAN <span className="text-[#D4AF37]">MUHAMMED</span>
           </div>
             <div className="text-[11px] font-mono text-[#22D3EE] tracking-widest uppercase">
-              FULL-STACK DEVELOPER &amp; CLOUD SYSTEMS
+              {isAr ? 'مطور برمجيات شامل وأنظمة سحابية' : 'FULL-STACK DEVELOPER & CLOUD SYSTEMS'}
             </div>
           </div>
 
@@ -112,7 +133,9 @@ export function BootLoader({ onComplete, isFast = false }) {
           <div className="w-full space-y-2">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="text-[#D4AF37] font-semibold tracking-wider">
-                {isFinished ? 'SYSTEMS LOADED' : 'INITIALIZING EXPERIENCE'}
+                {isFinished
+                  ? (isAr ? 'تم تحميل كافة الأنظمة' : 'SYSTEMS LOADED')
+                  : (isAr ? 'جارٍ تهيئة الأنظمة' : 'INITIALIZING EXPERIENCE')}
               </span>
               <span className="text-[#F4F6FB] font-bold">
                 {isFinished ? '✓' : `${progress}%`}
@@ -135,7 +158,7 @@ export function BootLoader({ onComplete, isFast = false }) {
           </div>
 
           {/* Typewriter Status Text */}
-          <div className="h-6 flex items-center justify-center">
+          <div className="min-h-[28px] flex items-center justify-center w-full px-1">
             <AnimatePresence mode="wait">
               <motion.div
                 key={lineIdx}
@@ -143,10 +166,10 @@ export function BootLoader({ onComplete, isFast = false }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -5 }}
                 transition={{ duration: 0.18 }}
-                className="text-xs font-mono text-[#9AA4BC] flex items-center gap-2"
+                className="text-[11px] sm:text-xs font-mono text-[#9AA4BC] flex items-center justify-center gap-2 text-center"
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE] animate-ping" />
-                <span>{statusLines[lineIdx]}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE] animate-ping shrink-0" />
+                <span className="tracking-tight">{statusLines[lineIdx]}</span>
               </motion.div>
             </AnimatePresence>
           </div>
