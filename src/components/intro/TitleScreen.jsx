@@ -151,14 +151,14 @@ export function TitleScreen({ onStart, onSkip }) {
         </div>
 
         {/* Top Bar Status Indicator */}
-        <div className="relative z-20 px-6 pt-5 flex items-center justify-between text-xs font-mono">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#0E1320]/80 border border-white/10 backdrop-blur-md shadow-sm">
+        <div className="relative z-20 px-4 sm:px-6 pt-5 flex items-center justify-between text-xs font-mono">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#0E1320]/80 border border-white/10 backdrop-blur-md shadow-sm">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#10B981]" />
             </span>
-            <span className="text-[#F4F6FB] font-semibold tracking-wider text-[11px]">
-              SYSTEM READY // INTERFACE ACTIVE
+            <span className="text-[#F4F6FB] font-semibold tracking-wider text-[10px] sm:text-[11px] whitespace-nowrap">
+              SYSTEM READY<span className="hidden sm:inline"> // INTERFACE ACTIVE</span>
             </span>
           </div>
         </div>

@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { FaReact, FaNodeJs, FaDocker, FaAws } from 'react-icons/fa';
 import {
+  SiNextdotjs,
+  SiTypescript,
+  SiTailwindcss,
+  SiWebrtc,
   SiExpress,
   SiNginx,
   SiPostman,
@@ -9,7 +13,8 @@ import {
   SiPostgresql
 } from 'react-icons/si';
 
-const baseTools = [
+// Original 10 tools for Desktop (doubled to 20 for rich dense orbital cloud)
+const desktopTools = [
   { name: 'React.js', icon: <FaReact />, color: '#61DAFB' },
   { name: 'Node.js', icon: <FaNodeJs />, color: '#10B981' },
   { name: 'Express.js', icon: <SiExpress />, color: '#F4F6FB' },
@@ -22,6 +27,22 @@ const baseTools = [
   { name: 'PostgreSQL', icon: <SiPostgresql />, color: '#336791' },
 ];
 
+// Optimized 12 unique tools for Mobile (zero duplicates, clean 3D orbit, smooth 60fps)
+const mobileTools = [
+  { name: 'Next.js', icon: <SiNextdotjs />, color: '#FFFFFF' },
+  { name: 'React.js', icon: <FaReact />, color: '#61DAFB' },
+  { name: 'TypeScript', icon: <SiTypescript />, color: '#3178C6' },
+  { name: 'Node.js', icon: <FaNodeJs />, color: '#10B981' },
+  { name: 'Express.js', icon: <SiExpress />, color: '#F4F6FB' },
+  { name: 'Docker', icon: <FaDocker />, color: '#2496ED' },
+  { name: 'AWS', icon: <FaAws />, color: '#FF9900' },
+  { name: 'Tailwind', icon: <SiTailwindcss />, color: '#38BDF8' },
+  { name: 'WebRTC', icon: <SiWebrtc />, color: '#326CE5' },
+  { name: 'MongoDB', icon: <SiMongodb />, color: '#47A248' },
+  { name: 'PostgreSQL', icon: <SiPostgresql />, color: '#336791' },
+  { name: 'Supabase', icon: <SiSupabase />, color: '#3ECF8E' },
+];
+
 export default function TechGlobe({ children }) {
   const containerRef = useRef(null);
   const [rotY, setRotY] = useState(0);
@@ -29,7 +50,7 @@ export default function TechGlobe({ children }) {
   const rotRef = useRef({ y: 0, x: 0.18, speedY: 0.006, speedX: 0 });
   const mouseRef = useRef({ isDown: false, lastX: 0, lastY: 0, isHover: false });
   const animFrameRef = useRef(null);
-  const [, setTick] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Responsive radii for the celestial sphere surrounding the center name
   const [radii, setRadii] = useState({
@@ -42,10 +63,12 @@ export default function TechGlobe({ children }) {
     const handleResize = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      if (w < 640) {
-        // Mobile screens
+      const mobile = w < 640;
+      setIsMobile(mobile);
+      if (mobile) {
+        // Mobile screens: compact radius to keep name readable
         setRadii({
-          radiusX: Math.min(190, w * 0.44),
+          radiusX: Math.min(185, w * 0.44),
           radiusY: Math.min(150, h * 0.22),
           radiusZ: 175,
         });
@@ -73,8 +96,9 @@ export default function TechGlobe({ children }) {
   const { radiusX, radiusY, radiusZ } = radii;
 
   // 3D Fibonacci sphere coordinate mapping
+  // Desktop: 20 items (original dense cloud) | Mobile: 12 unique items (no duplicates)
   const items = useMemo(() => {
-    const list = [...baseTools, ...baseTools];
+    const list = isMobile ? mobileTools : [...desktopTools, ...desktopTools];
     const total = list.length;
     return list.map((tool, i) => {
       const phi = Math.acos(1 - (2 * (i + 0.5)) / total);
@@ -86,7 +110,7 @@ export default function TechGlobe({ children }) {
         baseZ: radiusZ * Math.sin(phi) * Math.sin(theta),
       };
     });
-  }, [radiusX, radiusY, radiusZ]);
+  }, [radiusX, radiusY, radiusZ, isMobile]);
 
   // Smooth continuous 3D rotation loop
   useEffect(() => {
@@ -107,7 +131,6 @@ export default function TechGlobe({ children }) {
 
       setRotY(state.y);
       setRotX(state.x);
-      setTick((t) => (t + 1) % 100000);
       animFrameRef.current = requestAnimationFrame(loop);
     };
 
@@ -122,18 +145,12 @@ export default function TechGlobe({ children }) {
   // Global pointer drag listeners so dragging ANYWHERE on the screen rotates the globe
   useEffect(() => {
     let isDown = false;
-    let startX = 0;
-    let startY = 0;
     let lastX = 0;
     let lastY = 0;
 
-      const onPointerDown = (e) => {
-        // Don't drag if clicking buttons (audio, language, skip intro, press start)
-        if (e.target.closest('button')) return;
-
+    const onPointerDown = (e) => {
+      if (e.target.closest('button')) return;
       isDown = true;
-      startX = e.clientX;
-      startY = e.clientY;
       lastX = e.clientX;
       lastY = e.clientY;
       mouseRef.current.isDown = true;
@@ -152,11 +169,11 @@ export default function TechGlobe({ children }) {
       rotRef.current.x = Math.max(-0.55, Math.min(0.55, rotRef.current.x - dy * 0.006));
     };
 
-      const onPointerUp = () => {
-        if (!isDown) return;
-        isDown = false;
-        mouseRef.current.isDown = false;
-      };
+    const onPointerUp = () => {
+      if (!isDown) return;
+      isDown = false;
+      mouseRef.current.isDown = false;
+    };
 
     window.addEventListener('pointerdown', onPointerDown);
     window.addEventListener('pointermove', onPointerMove);
@@ -231,7 +248,6 @@ export default function TechGlobe({ children }) {
       ref={containerRef}
       dir="ltr"
       onClick={(e) => {
-        // Clicks inside the globe boundary should not navigate to main page
         e.stopPropagation();
       }}
       className="relative flex items-center justify-center select-none mx-auto cursor-grab active:cursor-grabbing"
@@ -289,16 +305,17 @@ export default function TechGlobe({ children }) {
       {backItems.map((tool) => (
         <div
           key={tool.key}
-          className="absolute flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full backdrop-blur-sm pointer-events-none"
+          className={`absolute flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full pointer-events-none ${isMobile ? 'backdrop-blur-none' : 'backdrop-blur-sm'}`}
           style={{
             left: '50%',
             top: '50%',
             transform: `translate(-50%, -50%) translate3d(${tool.screenX}px, ${tool.screenY}px, 0px) scale(${tool.scale})`,
             opacity: tool.opacity,
             zIndex: tool.zIndex,
-            filter: `blur(${tool.blur}px)`,
-            backgroundColor: 'rgba(11, 15, 28, 0.45)',
+            filter: isMobile ? undefined : (tool.blur > 0.4 ? `blur(${tool.blur}px)` : undefined),
+            backgroundColor: isMobile ? 'rgba(11, 15, 28, 0.7)' : 'rgba(11, 15, 28, 0.45)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
+            willChange: 'transform, opacity',
           }}
         >
           <span className="text-xs flex items-center justify-center shrink-0" style={{ color: tool.color }}>
@@ -316,30 +333,33 @@ export default function TechGlobe({ children }) {
       </div>
 
       {/* LAYER 3: FRONT ITEMS (Rotating IN FRONT OF and OVER the name) */}
-      {
-        frontItems.map((tool) => (
-          <div
-            key={tool.key}
-            className="absolute flex items-center gap-2 px-3 py-1.5 sm:px-3.5 sm:py-1.5 rounded-full backdrop-blur-md pointer-events-none shadow-[0_4px_22px_rgba(0,0,0,0.6),0_0_15px_rgba(212,175,55,0.22)]"
-            style={{
-              left: '50%',
-              top: '50%',
-              transform: `translate(-50%, -50%) translate3d(${tool.screenX}px, ${tool.screenY}px, 0px) scale(${tool.scale})`,
-              opacity: tool.opacity,
-              zIndex: tool.zIndex,
-              backgroundColor: 'rgba(14, 19, 32, 0.88)',
-              border: '1px solid rgba(212, 175, 55, 0.45)',
-            }}
-          >
-            <span className="text-xs sm:text-sm flex items-center justify-center shrink-0" style={{ color: tool.color }}>
-              {tool.icon}
-            </span>
-            <span className="text-[11px] sm:text-xs font-mono font-bold tracking-tight whitespace-nowrap text-[#F4F6FB]">
-              {tool.name}
-            </span>
-          </div>
-        ))
-      }
-    </div >
+      {frontItems.map((tool) => (
+        <div
+          key={tool.key}
+          className={`absolute flex items-center gap-1.5 sm:gap-2 px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full pointer-events-none ${
+            isMobile
+              ? 'backdrop-blur-none shadow-[0_4px_18px_rgba(0,0,0,0.5),0_0_12px_rgba(212,175,55,0.2)]'
+              : 'backdrop-blur-md shadow-[0_4px_22px_rgba(0,0,0,0.6),0_0_15px_rgba(212,175,55,0.22)]'
+          }`}
+          style={{
+            left: '50%',
+            top: '50%',
+            transform: `translate(-50%, -50%) translate3d(${tool.screenX}px, ${tool.screenY}px, 0px) scale(${tool.scale})`,
+            opacity: tool.opacity,
+            zIndex: tool.zIndex,
+            backgroundColor: isMobile ? 'rgba(14, 19, 32, 0.95)' : 'rgba(14, 19, 32, 0.88)',
+            border: '1px solid rgba(212, 175, 55, 0.45)',
+            willChange: 'transform, opacity',
+          }}
+        >
+          <span className="text-xs sm:text-sm flex items-center justify-center shrink-0" style={{ color: tool.color }}>
+            {tool.icon}
+          </span>
+          <span className="text-[10px] sm:text-xs font-mono font-bold tracking-tight whitespace-nowrap text-[#F4F6FB]">
+            {tool.name}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }
