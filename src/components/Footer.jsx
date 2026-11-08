@@ -1,6 +1,7 @@
 import { FiArrowUp, FiHeart, FiGlobe, FiSun, FiMoon, FiMail } from 'react-icons/fi';
 import { FaWhatsapp, FaGithub, FaLinkedin } from 'react-icons/fa';
 import { openProtectedWhatsApp } from '../utils/safeContact';
+import { trackEvent } from '../utils/analytics';
 import { useLanguage } from '../i18n';
 import { useTheme } from '../context';
 
@@ -38,6 +39,9 @@ export default function Footer() {
               href="https://github.com/adnan-Muhammed/"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackEvent('social_click', { platform: 'github', location: 'footer' });
+              }}
               className="p-2.5 rounded-xl bg-white/5 dark:bg-white/5 light:bg-white hover:bg-white/10 text-[#9AA4BC] hover:text-[#D4AF37] border border-white/5 dark:border-white/5 light:border-slate-200 transition-colors"
               aria-label="GitHub"
             >
@@ -47,6 +51,9 @@ export default function Footer() {
               href="https://www.linkedin.com/in/adnan-muhammed-s/"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackEvent('social_click', { platform: 'linkedin', location: 'footer' });
+              }}
               className="p-2.5 rounded-xl bg-white/5 dark:bg-white/5 light:bg-white hover:bg-white/10 text-[#9AA4BC] hover:text-[#D4AF37] border border-white/5 dark:border-white/5 light:border-slate-200 transition-colors"
               aria-label="LinkedIn"
             >
@@ -54,7 +61,10 @@ export default function Footer() {
             </a>
             <button
               type="button"
-              onClick={openProtectedWhatsApp}
+              onClick={() => {
+                trackEvent('contact_click', { channel: 'whatsapp', location: 'footer' });
+                openProtectedWhatsApp();
+              }}
               className="p-2.5 rounded-xl bg-[#10B981]/10 hover:bg-[#10B981]/20 text-[#10B981] border border-[#10B981]/30 transition-colors cursor-pointer"
               aria-label="WhatsApp"
               title="Chat on WhatsApp"
@@ -63,6 +73,9 @@ export default function Footer() {
             </button>
             <a
               href="mailto:adnan.shajahan786@gmail.com"
+              onClick={() => {
+                trackEvent('contact_click', { channel: 'email', location: 'footer' });
+              }}
               className="p-2.5 rounded-xl bg-white/5 dark:bg-white/5 light:bg-white hover:bg-white/10 text-[#9AA4BC] hover:text-[#D4AF37] border border-white/5 dark:border-white/5 light:border-slate-200 transition-colors"
               aria-label="Email"
             >
@@ -106,6 +119,9 @@ export default function Footer() {
               href="https://www.linkedin.com/in/adnan-muhammed-s/"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => {
+                trackEvent('social_click', { platform: 'linkedin', location: 'footer_attribution' });
+              }}
               className="text-[#D4AF37] hover:text-[#FAFFE6] hover:underline transition-colors font-semibold"
             >
               Adnan Muhammed

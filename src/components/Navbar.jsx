@@ -13,6 +13,7 @@ import {
 } from 'react-icons/fi';
 import { FaWhatsapp, FaGithub, FaLinkedin } from 'react-icons/fa';
 import { openProtectedWhatsApp } from '../utils/safeContact';
+import { trackEvent } from '../utils/analytics';
 import { useLanguage } from '../i18n';
 import { useTheme } from '../context';
 
@@ -128,7 +129,10 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-2">
             {/* Theme Toggle (Dark / Light) */}
             <button
-              onClick={toggleTheme}
+              onClick={() => {
+                trackEvent('theme_toggle', { to_theme: isDark ? 'light' : 'dark', location: 'navbar' });
+                toggleTheme();
+              }}
               className="p-2 rounded-xl bg-[#0E1320] dark:bg-[#0E1320] light:bg-slate-100 border border-white/10 dark:border-white/10 light:border-slate-200 text-[#D4AF37] hover:scale-105 active:scale-95 transition-all"
               title={isDark ? t('nav.themeLight', 'Switch to Light Mode') : t('nav.themeDark', 'Switch to Dark Mode')}
               aria-label="Toggle Theme"
@@ -138,7 +142,10 @@ export default function Navbar() {
 
             {/* Language Toggle (EN / AR) */}
             <button
-              onClick={toggleLang}
+              onClick={() => {
+                trackEvent('language_toggle', { to_lang: lang === 'en' ? 'ar' : 'en', location: 'navbar' });
+                toggleLang();
+              }}
               className="px-3 py-1.5 rounded-xl bg-[#0E1320] dark:bg-[#0E1320] light:bg-slate-100 border border-white/10 dark:border-white/10 light:border-slate-200 hover:border-[#D4AF37]/50 text-xs font-mono text-[#cbd5e1] dark:text-[#cbd5e1] light:text-slate-700 hover:text-white flex items-center gap-1.5 transition-all"
               title="Toggle Language (English / العربية)"
             >
@@ -149,7 +156,10 @@ export default function Navbar() {
             {/* Direct WhatsApp CTA (Protected Obfuscated Trigger) */}
             <button
               type="button"
-              onClick={openProtectedWhatsApp}
+              onClick={() => {
+                trackEvent('contact_click', { channel: 'whatsapp', location: 'navbar_desktop' });
+                openProtectedWhatsApp();
+              }}
               className="p-2 rounded-xl bg-[#10B981]/10 border border-[#10B981]/30 hover:border-[#10B981] text-[#10B981] hover:scale-105 transition-all cursor-pointer"
               title="Chat on WhatsApp"
               aria-label="Chat on WhatsApp"
@@ -160,6 +170,9 @@ export default function Navbar() {
             {/* Resume / Contact Button */}
             <a
               href="#contact"
+              onClick={() => {
+                trackEvent('cta_click', { target: '#contact', location: 'navbar_desktop' });
+              }}
               className="text-xs font-heading font-bold px-4 py-2 rounded-full bg-gradient-to-r from-[#F5E6A8] via-[#D4AF37] to-[#C59B27] text-[#070A12] shadow-[0_2px_12px_rgba(212,175,55,0.3)] hover:brightness-105 hover:scale-105 transition-all flex items-center gap-1.5"
             >
               <span>{t('hero.ctaContact', "Let's Talk")}</span>
@@ -229,7 +242,10 @@ export default function Navbar() {
               <div className="pt-3 border-t border-white/10 dark:border-white/10 light:border-slate-200 flex items-center justify-between gap-3">
                 <a
                   href="#contact"
-                  onClick={() => setMobileOpen(false)}
+                  onClick={() => {
+                    trackEvent('cta_click', { target: '#contact', location: 'navbar_mobile_menu' });
+                    setMobileOpen(false);
+                  }}
                   className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#F5E6A8] via-[#D4AF37] to-[#C59B27] text-[#070A12] font-heading font-bold text-xs text-center shadow-md"
                 >
                   {t('hero.ctaContact', "Let's Talk")}
@@ -237,6 +253,7 @@ export default function Navbar() {
                 <button
                   type="button"
                   onClick={() => {
+                    trackEvent('contact_click', { channel: 'whatsapp', location: 'navbar_mobile_menu' });
                     setMobileOpen(false);
                     openProtectedWhatsApp();
                   }}

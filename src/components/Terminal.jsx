@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { FiWifi } from 'react-icons/fi';
+import { trackEvent } from '../utils/analytics';
 import { useLanguage } from '../i18n';
 
 const COMMANDS = {
@@ -134,6 +135,8 @@ export default function Terminal() {
   const executeCommand = (cmdText) => {
     const trimmed = cmdText.trim().toLowerCase();
     if (!trimmed) return;
+
+    trackEvent('terminal_command', { command: trimmed });
 
     if (trimmed === 'clear') {
       setHistory([]);

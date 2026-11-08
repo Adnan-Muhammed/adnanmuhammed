@@ -21,6 +21,7 @@ import {
 } from 'react-icons/si';
 import { useLanguage } from '../i18n';
 import { useTheme } from '../context';
+import { trackEvent } from '../utils/analytics';
 
 const coreTech = [
   { name: 'React.js', icon: <FaReact className="text-[#61DAFB]" /> },
@@ -111,6 +112,9 @@ export default function Hero() {
               {/* Primary CTA */}
               <a
                 href="#projects"
+                onClick={() => {
+                  trackEvent('cta_click', { target: '#projects', location: 'hero' });
+                }}
                 className="btn-cyber-primary group shadow-[0_4px_20px_rgba(212,175,55,0.3)] flex items-center gap-2"
               >
                 <span>{t('hero.ctaProjects', 'Explore Featured Projects')}</span>
@@ -120,6 +124,9 @@ export default function Hero() {
               {/* Architecture CTA */}
               <a
                 href="#architecture"
+                onClick={() => {
+                  trackEvent('cta_click', { target: '#architecture', location: 'hero' });
+                }}
                 className="btn-cyber-secondary flex items-center gap-2"
               >
                 <FiCloud className="text-[#22D3EE]" />
@@ -129,6 +136,9 @@ export default function Hero() {
               {/* Contact CTA */}
               <a
                 href="#contact"
+                onClick={() => {
+                  trackEvent('cta_click', { target: '#contact', location: 'hero' });
+                }}
                 className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-[#9AA4BC] hover:text-[#D4AF37] px-3 py-2 transition-colors"
               >
                 <span>{t('hero.ctaContact', 'Get in Touch')}</span>
@@ -242,6 +252,9 @@ export default function Hero() {
                 {/* Quick Link to Terminal */}
                 <a
                   href="#terminal"
+                  onClick={() => {
+                    trackEvent('cta_click', { target: '#terminal', location: 'hero_system_preview' });
+                  }}
                   className="w-full py-2.5 px-3 rounded-xl bg-white/5 dark:bg-white/5 light:bg-slate-100 hover:bg-[#D4AF37]/10 border border-white/10 dark:border-white/10 light:border-slate-200 text-[#D4AF37] flex items-center justify-between transition-colors"
                 >
                   <span className="flex items-center gap-1.5">

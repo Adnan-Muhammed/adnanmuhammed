@@ -12,6 +12,7 @@ import {
 import { SectionTitle } from './ui/SectionTitle';
 import { GlassCard } from './ui/GlassCard';
 import { Reveal } from './ui/Reveal';
+import { trackEvent } from '../utils/analytics';
 import { useLanguage } from '../i18n';
 
 export default function Projects() {
@@ -112,18 +113,18 @@ export default function Projects() {
             eyebrow={t('projects.badge', 'Featured Work')}
             title={
               lang === 'ar' ? (
-          <>
-            مشاريع وأنظمة{' '}
-            <span className="gold-gradient-text">إنتاجية حقيقية</span>
-          </>
-          ) : (
-          <>
-            Real-World Production{' '}
-            <span className="gold-gradient-text">Applications</span>
-          </>
-          )
+                <>
+                  مشاريع وأنظمة{' '}
+                  <span className="gold-gradient-text">إنتاجية حقيقية</span>
+                </>
+              ) : (
+                <>
+                  Real-World Production{' '}
+                  <span className="gold-gradient-text">Applications</span>
+                </>
+              )
             }
-          subtitle={t('projects.subtitle', 'End-to-end applications built with deliberate architectural decisions, cloud deployments, and solving real user problems.')}
+            subtitle={t('projects.subtitle', 'End-to-end applications built with deliberate architectural decisions, cloud deployments, and solving real user problems.')}
           />
         </Reveal>
 
@@ -159,7 +160,13 @@ export default function Projects() {
 
                       {/* Browser Viewport with Project Screenshot */}
                       <div
-                        onClick={() => setPreviewImage(project.image)}
+                        onClick={() => {
+                          setPreviewImage(project.image);
+                          trackEvent('project_image_preview', {
+                            project_id: project.id,
+                            project_name: project.title,
+                          });
+                        }}
                         className="relative aspect-[16/10] overflow-hidden bg-[#0A0D18] flex items-center justify-center cursor-zoom-in group/mockup"
                         title="Click to view full screenshot"
                       >
@@ -215,6 +222,14 @@ export default function Projects() {
                           href={project.live}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={() => {
+                            trackEvent('project_live_visit', {
+                              project_id: project.id,
+                              project_name: project.title,
+                              target_url: project.live,
+                              location: 'projects_card',
+                            });
+                          }}
                           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-heading font-semibold text-xs bg-gradient-to-r from-[#D4AF37] to-[#F5E6A8] text-[#070A12] hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:scale-105 transition-all cursor-pointer"
                         >
                           <span>{t('work.visitSite', 'Visit live site')}</span>
@@ -224,6 +239,12 @@ export default function Projects() {
 
                       <a
                         href="#architecture"
+                        onClick={() => {
+                          trackEvent('project_architecture_click', {
+                            project_id: project.id,
+                            project_name: project.title,
+                          });
+                        }}
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-heading font-medium text-xs text-[#9AA4BC] hover:text-white border border-white/10 hover:border-[#D4AF37]/40 bg-[#0E1320] transition-colors"
                       >
                         <FiLayers size={13} className="text-[#22D3EE]" />

@@ -23,7 +23,7 @@ export default function CVSection() {
   const { t } = useLanguage();
   const [showPreview, setShowPreview] = useState(false);
   const downloadCvPath = '/cv/Adnan-Muhammed-CV.pdf';
-  const previewCvPath = '/cv/Adnan_Muhammed-CV-preview.pdf';
+  const previewCvPath = '/cv/Adnan-Muhammed-CV-preview.pdf';
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -41,32 +41,32 @@ export default function CVSection() {
     };
   }, [showPreview]);
 
-  const handleDownload = () => {
+  const handleDownload = (source = 'cv_section') => {
     try {
       cyberAudio.playCoin();
     } catch {
       // Audio optional
     }
-    trackEvent('cv_download', { file: 'Adnan-Muhammed-CV.pdf', source: 'cv_section' });
+    trackEvent('cv_download', { file: 'Adnan-Muhammed-CV.pdf', source, location: source });
   };
 
-  const handleOpenTab = () => {
+  const handleOpenTab = (source = 'cv_section') => {
     try {
       cyberAudio.playSoftClick();
     } catch {
       // Audio optional
     }
-    trackEvent('cv_view', { file: 'Adnan_Muhammed-CV-preview.pdf', source: 'cv_section' });
+    trackEvent('cv_new_tab_open', { file: 'Adnan-Muhammed-CV-preview.pdf', source, location: source });
   };
 
-  const handleOpenPreview = () => {
+  const handleOpenPreview = (source = 'cv_section') => {
     try {
       cyberAudio.playSoftClick();
     } catch {
       // Audio optional
     }
     setShowPreview(true);
-    trackEvent('cv_preview_open', { file: 'Adnan_Muhammed-CV-preview.pdf', source: 'cv_section' });
+    trackEvent('cv_preview_open', { file: 'Adnan-Muhammed-CV-preview.pdf', source, location: source });
   };
 
   return (
@@ -162,7 +162,7 @@ export default function CVSection() {
                   {/* Preview Button */}
                   <button
                     type="button"
-                    onClick={handleOpenPreview}
+                    onClick={() => handleOpenPreview('cv_card_preview_btn')}
                     className="py-2.5 px-4 rounded-full bg-gradient-to-r from-[#F5E6A8] via-[#D4AF37] to-[#C59B27] text-[#070A12] font-heading font-bold text-xs tracking-wide shadow-md flex items-center justify-center gap-1.5 hover:brightness-105 hover:scale-[1.02] transition-all cursor-pointer"
                   >
                     <FiEye size={15} />
@@ -174,7 +174,7 @@ export default function CVSection() {
                     href={previewCvPath}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={handleOpenTab}
+                    onClick={() => handleOpenTab('cv_card_new_tab_btn')}
                     className="py-2.5 px-3.5 rounded-full bg-[#141A2B] dark:bg-[#141A2B] light:bg-slate-100 text-white dark:text-white light:text-slate-800 hover:text-[#D4AF37] border border-white/10 hover:border-[#D4AF37] text-xs font-heading font-semibold flex items-center justify-center gap-1.5 transition-all hover:scale-[1.02] cursor-pointer"
                     title={t('cvSection.openInTab', 'Open in New Tab')}
                   >
@@ -186,7 +186,7 @@ export default function CVSection() {
                   <a
                     href={downloadCvPath}
                     download="Adnan-Muhammed-CV.pdf"
-                    onClick={handleDownload}
+                    onClick={() => handleDownload('cv_card_download_icon')}
                     className="p-2.5 rounded-full bg-[#0E1320] dark:bg-[#0E1320] light:bg-white text-[#9AA4BC] hover:text-[#D4AF37] border border-white/10 hover:border-[#D4AF37]/50 transition-all hover:scale-105 cursor-pointer"
                     title={t('cvSection.downloadPdf', 'Download CV (PDF)')}
                     aria-label="Download CV (PDF)"
@@ -197,6 +197,9 @@ export default function CVSection() {
                   {/* Contact Button */}
                   <a
                     href="#contact"
+                    onClick={() => {
+                      trackEvent('cta_click', { target: '#contact', source: 'cv_section', location: 'cv_card' });
+                    }}
                     className="py-2.5 px-3.5 rounded-full bg-[#0E1320] dark:bg-[#0E1320] light:bg-white text-[#D4AF37] dark:text-[#D4AF37] light:text-amber-700 font-heading font-bold text-xs tracking-wide border border-[#D4AF37]/30 hover:border-[#D4AF37] flex items-center justify-center gap-1.5 transition-all hover:scale-[1.02]"
                   >
                     <span>{t('cvSection.hireMe', 'Contact')}</span>
@@ -222,7 +225,7 @@ export default function CVSection() {
                     <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto text-[11px]">
                       <button
                         type="button"
-                        onClick={handleOpenPreview}
+                        onClick={() => handleOpenPreview('cv_viewer_header')}
                         className="text-[#D4AF37] hover:underline flex items-center gap-1 cursor-pointer font-semibold whitespace-nowrap"
                       >
                         <FiMaximize2 size={12} />
@@ -233,7 +236,7 @@ export default function CVSection() {
                         href={previewCvPath}
                         target="_blank"
                         rel="noopener noreferrer"
-                        onClick={handleOpenTab}
+                        onClick={() => handleOpenTab('cv_viewer_header_new_tab')}
                         className="text-[#10B981] hover:underline flex items-center gap-1 cursor-pointer font-semibold whitespace-nowrap"
                       >
                         <FiExternalLink size={12} />
@@ -245,7 +248,7 @@ export default function CVSection() {
                   {/* PDF Document Frame - Full Width & Clean Aspect Ratio */}
                   <div className="w-full">
                     <div
-                      onClick={handleOpenPreview}
+                      onClick={() => handleOpenPreview('cv_frame_click')}
                       className="relative w-full h-[420px] sm:h-[540px] rounded-2xl overflow-hidden bg-[#0A0D18] border border-white/10 shadow-2xl group/viewer cursor-pointer"
                       title="Click to view full preview"
                     >
@@ -267,7 +270,7 @@ export default function CVSection() {
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleOpenPreview();
+                            handleOpenPreview('cv_hover_overlay');
                           }}
                           className="px-4 py-2 rounded-full bg-[#D4AF37] text-[#070A12] font-heading font-bold text-xs flex items-center gap-1.5 shadow-lg hover:scale-105 transition-all cursor-pointer"
                         >
@@ -280,7 +283,7 @@ export default function CVSection() {
                           rel="noopener noreferrer"
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleOpenTab();
+                            handleOpenTab('cv_hover_overlay_new_tab');
                           }}
                           className="px-4 py-2 rounded-full bg-[#141A2B] text-white border border-white/20 font-heading font-semibold text-xs flex items-center gap-1.5 shadow-lg hover:scale-105 transition-all cursor-pointer"
                         >
@@ -305,7 +308,7 @@ export default function CVSection() {
                         <div className="flex flex-col w-full gap-2.5 pt-2">
                           <button
                             type="button"
-                            onClick={handleOpenPreview}
+                            onClick={() => handleOpenPreview('cv_mobile_fallback_preview')}
                             className="w-full py-2.5 rounded-full bg-gradient-to-r from-[#F5E6A8] via-[#D4AF37] to-[#C59B27] text-[#070A12] font-heading font-bold text-xs text-center shadow-md flex items-center justify-center gap-1.5"
                           >
                             <FiEye size={14} />
@@ -315,7 +318,7 @@ export default function CVSection() {
                             href={previewCvPath}
                             target="_blank"
                             rel="noopener noreferrer"
-                            onClick={handleOpenTab}
+                            onClick={() => handleOpenTab('cv_mobile_fallback_new_tab')}
                             className="w-full py-2.5 rounded-full bg-[#141A2B] text-white border border-white/10 text-xs text-center flex items-center justify-center gap-1.5"
                           >
                             <FiExternalLink size={14} />
@@ -375,7 +378,7 @@ export default function CVSection() {
                     href={previewCvPath}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={handleOpenTab}
+                    onClick={() => handleOpenTab('cv_modal_top_bar_new_tab')}
                     className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white hover:text-[#D4AF37] border border-white/10 transition-colors text-xs font-medium whitespace-nowrap cursor-pointer shrink-0"
                     title={t('cvSection.openInTab', 'Open in New Tab')}
                   >
@@ -388,7 +391,7 @@ export default function CVSection() {
                   <a
                     href={downloadCvPath}
                     download="Adnan-Muhammed-CV.pdf"
-                    onClick={handleDownload}
+                    onClick={() => handleDownload('cv_modal_top_bar_download')}
                     className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-[#D4AF37] text-[#070A12] font-semibold hover:brightness-110 transition-colors text-xs whitespace-nowrap cursor-pointer shrink-0"
                     title={t('cvSection.downloadPdf', 'Download CV')}
                   >
@@ -399,7 +402,10 @@ export default function CVSection() {
                   {/* Close Button */}
                   <button
                     type="button"
-                    onClick={() => setShowPreview(false)}
+                    onClick={() => {
+                      trackEvent('cv_modal_close', { location: 'cv_modal' });
+                      setShowPreview(false);
+                    }}
                     className="p-1.5 sm:p-2 rounded-lg bg-white/10 hover:bg-red-500/80 text-white transition-colors cursor-pointer shrink-0 flex items-center justify-center"
                     aria-label="Close preview"
                     title="Close preview"
@@ -410,75 +416,75 @@ export default function CVSection() {
               </div>
 
               {/* Modal PDF Viewport with internal scroll */}
-                <div className="flex-1 w-full h-full bg-[#0E1320] overflow-hidden relative">
-                  {/* Desktop PDF Viewer */}
-                  <div className="hidden sm:block w-full h-full">
-                    <object
-                      data={`${previewCvPath}#view=FitH&toolbar=1`}
-                      type="application/pdf"
-                      className="w-full h-full"
-                    >
-                      <iframe
-                        src={`${previewCvPath}#view=FitH&toolbar=1`}
-                        title="Adnan Muhammed CV"
-                        className="w-full h-full border-0"
-                      />
-                    </object>
-                  </div>
-
-                  {/* Mobile-Friendly Native Viewer fallback (prevents 'refused to connect' on phones) */}
-                  <div className="flex sm:hidden flex-col items-center justify-center h-full p-6 text-center space-y-4 bg-[#070A12]">
-                    <div className="w-16 h-16 rounded-2xl bg-[#0E1320] border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37] text-2xl shadow-lg">
-                      <FiFileText />
-                    </div>
-                    <div>
-                      <h5 className="font-heading font-bold text-white text-base">
-                        {t('cvSection.mobileFallbackTitle', 'Adnan Muhammed — Engineering Resume')}
-                      </h5>
-                      <p className="text-xs text-[#9AA4BC] mt-1 max-w-xs">
-                        {t('cvSection.mobileFallbackDesc', 'Production-Ready Full-Stack Developer (MERN & Next.js, Docker, AWS EC2)')}
-                      </p>
-                    </div>
-                    <div className="flex flex-col w-full gap-2.5 pt-2">
-                      <a
-                        href={previewCvPath}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={handleOpenTab}
-                        className="w-full py-2.5 rounded-full bg-gradient-to-r from-[#F5E6A8] via-[#D4AF37] to-[#C59B27] text-[#070A12] font-heading font-bold text-xs text-center shadow-md flex items-center justify-center gap-1.5"
-                      >
-                        <FiExternalLink size={14} />
-                        <span>{t('cvSection.openInTab', 'Open PDF in Full Screen')}</span>
-                      </a>
-                      <a
-                        href={downloadCvPath}
-                        download="Adnan-Muhammed-CV.pdf"
-                        onClick={handleDownload}
-                        className="w-full py-2.5 rounded-full bg-[#141A2B] text-white border border-white/10 text-xs text-center flex items-center justify-center gap-1.5"
-                      >
-                        <FiDownload size={14} />
-                        <span>{t('cvSection.downloadPdf', 'Download PDF Document')}</span>
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Modal Bottom Bar - Replaces blank bottom space with thumb-friendly controls */}
-                <div className="px-4 py-2.5 bg-[#141A2B] border-t border-white/10 flex items-center justify-between text-xs font-mono text-[#9AA4BC] shrink-0">
-                  <span className="flex items-center gap-1.5 text-[#10B981] text-[11px]">
-                    <FiShield size={13} className="shrink-0" />
-                    <span>{t('cvSection.format', 'FORMAT: PDF · PRINT & ATS OPTIMIZED')}</span>
-                  </span>
-                  <a
-                    href={downloadCvPath}
-                    download="Adnan-Muhammed-CV.pdf"
-                    onClick={handleDownload}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#D4AF37] text-[#070A12] font-heading font-bold text-xs hover:brightness-110 transition-all cursor-pointer shadow-sm"
+              <div className="flex-1 w-full h-full bg-[#0E1320] overflow-hidden relative">
+                {/* Desktop PDF Viewer */}
+                <div className="hidden sm:block w-full h-full">
+                  <object
+                    data={`${previewCvPath}#view=FitH&toolbar=1`}
+                    type="application/pdf"
+                    className="w-full h-full"
                   >
-                    <FiDownload size={12} />
-                    <span>Download PDF</span>
-                  </a>
+                    <iframe
+                      src={`${previewCvPath}#view=FitH&toolbar=1`}
+                      title="Adnan Muhammed CV"
+                      className="w-full h-full border-0"
+                    />
+                  </object>
                 </div>
+
+                {/* Mobile-Friendly Native Viewer fallback (prevents 'refused to connect' on phones) */}
+                <div className="flex sm:hidden flex-col items-center justify-center h-full p-6 text-center space-y-4 bg-[#070A12]">
+                  <div className="w-16 h-16 rounded-2xl bg-[#0E1320] border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37] text-2xl shadow-lg">
+                    <FiFileText />
+                  </div>
+                  <div>
+                    <h5 className="font-heading font-bold text-white text-base">
+                      {t('cvSection.mobileFallbackTitle', 'Adnan Muhammed — Engineering Resume')}
+                    </h5>
+                    <p className="text-xs text-[#9AA4BC] mt-1 max-w-xs">
+                      {t('cvSection.mobileFallbackDesc', 'Production-Ready Full-Stack Developer (MERN & Next.js, Docker, AWS EC2)')}
+                    </p>
+                  </div>
+                  <div className="flex flex-col w-full gap-2.5 pt-2">
+                    <a
+                      href={previewCvPath}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => handleOpenTab('cv_modal_mobile_new_tab')}
+                      className="w-full py-2.5 rounded-full bg-gradient-to-r from-[#F5E6A8] via-[#D4AF37] to-[#C59B27] text-[#070A12] font-heading font-bold text-xs text-center shadow-md flex items-center justify-center gap-1.5"
+                    >
+                      <FiExternalLink size={14} />
+                      <span>{t('cvSection.openInTab', 'Open PDF in Full Screen')}</span>
+                    </a>
+                    <a
+                      href={downloadCvPath}
+                      download="Adnan-Muhammed-CV.pdf"
+                      onClick={() => handleDownload('cv_modal_mobile_download')}
+                      className="w-full py-2.5 rounded-full bg-[#141A2B] text-white border border-white/10 text-xs text-center flex items-center justify-center gap-1.5"
+                    >
+                      <FiDownload size={14} />
+                      <span>{t('cvSection.downloadPdf', 'Download PDF Document')}</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Bottom Bar - Replaces blank bottom space with thumb-friendly controls */}
+              <div className="px-4 py-2.5 bg-[#141A2B] border-t border-white/10 flex items-center justify-between text-xs font-mono text-[#9AA4BC] shrink-0">
+                <span className="flex items-center gap-1.5 text-[#10B981] text-[11px]">
+                  <FiShield size={13} className="shrink-0" />
+                  <span>{t('cvSection.format', 'FORMAT: PDF · PRINT & ATS OPTIMIZED')}</span>
+                </span>
+                <a
+                  href={downloadCvPath}
+                  download="Adnan-Muhammed-CV.pdf"
+                  onClick={() => handleDownload('cv_modal_bottom_bar_download')}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#D4AF37] text-[#070A12] font-heading font-bold text-xs hover:brightness-110 transition-all cursor-pointer shadow-sm"
+                >
+                  <FiDownload size={12} />
+                  <span>Download PDF</span>
+                </a>
+              </div>
             </motion.div>
           </motion.div>
         )

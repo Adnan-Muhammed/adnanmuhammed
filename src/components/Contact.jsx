@@ -13,6 +13,7 @@ import {
 import { FaWhatsapp } from 'react-icons/fa';
 import emailjs from '@emailjs/browser';
 import { openProtectedWhatsApp, openFollowUpWhatsApp } from '../utils/safeContact';
+import { trackEvent } from '../utils/analytics';
 import { useLanguage } from '../i18n';
 import { SectionTitle } from './ui/SectionTitle';
 import { GlassCard } from './ui/GlassCard';
@@ -83,6 +84,12 @@ export default function Contact() {
     if (!isConfigured) {
       console.warn('EmailJS environment variables are not configured in .env');
       setStatus('error');
+      trackEvent('contact_form_submit', {
+        status: 'error',
+        error_reason: 'unconfigured_credentials',
+        subject: formData.subject,
+        location: 'contact_section',
+      });
       setErrorMessage(
         t(
           'contact.errorNotConfigured',
@@ -125,6 +132,11 @@ export default function Contact() {
       setActiveToken(generatedToken);
       setCooldown(record);
       setStatus('success');
+      trackEvent('contact_form_submit', {
+        status: 'success',
+        subject: formData.subject,
+        location: 'contact_section',
+      });
 
       // Clear form inputs after successful submission
       setFormData({
@@ -136,6 +148,12 @@ export default function Contact() {
     } catch (error) {
       console.error('EmailJS submission error:', error);
       setStatus('error');
+      trackEvent('contact_form_submit', {
+        status: 'error',
+        error_reason: error?.text || error?.message || 'submission_failed',
+        subject: formData.subject,
+        location: 'contact_section',
+      });
       setErrorMessage(
         error?.text ||
         error?.message ||
@@ -205,7 +223,10 @@ export default function Contact() {
                     {/* WhatsApp (Protected Obfuscated Trigger - No plaintext number in DOM) */}
                     <button
                       type="button"
-                      onClick={openProtectedWhatsApp}
+                      onClick={() => {
+                        trackEvent('contact_click', { channel: 'whatsapp', location: 'contact_section_card' });
+                        openProtectedWhatsApp();
+                      }}
                       className="w-full p-4 rounded-xl bg-[#070A12]/60 dark:bg-[#070A12]/60 light:bg-slate-50 border border-white/5 dark:border-white/5 light:border-slate-200 hover:border-[#10B981]/50 transition-all flex items-center gap-4 group shadow-sm text-left cursor-pointer"
                     >
                       <div className="p-3 rounded-lg bg-[#10B981]/10 text-[#10B981] group-hover:scale-110 transition-transform">
@@ -225,6 +246,9 @@ export default function Contact() {
                     {/* Email */}
                     <a
                       href="mailto:adnan.shajahan786@gmail.com"
+                      onClick={() => {
+                        trackEvent('contact_click', { channel: 'email', location: 'contact_section_card' });
+                      }}
                       className="p-4 rounded-xl bg-[#070A12]/60 dark:bg-[#070A12]/60 light:bg-slate-50 border border-white/5 dark:border-white/5 light:border-slate-200 hover:border-[#D4AF37]/50 transition-all flex items-center gap-4 group shadow-sm"
                     >
                       <div className="p-3 rounded-lg bg-[#D4AF37]/10 text-[#D4AF37] group-hover:scale-110 transition-transform">
@@ -246,6 +270,9 @@ export default function Contact() {
                       href="https://github.com/adnan-Muhammed/"
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => {
+                        trackEvent('social_click', { platform: 'github', location: 'contact_section_card' });
+                      }}
                       className="p-4 rounded-xl bg-[#070A12]/60 dark:bg-[#070A12]/60 light:bg-slate-50 border border-white/5 dark:border-white/5 light:border-slate-200 hover:border-[#22D3EE]/50 transition-all flex items-center gap-4 group"
                     >
                       <div className="p-3 rounded-lg bg-[#22D3EE]/10 text-[#22D3EE] group-hover:scale-110 transition-transform">
@@ -267,6 +294,9 @@ export default function Contact() {
                       href="https://www.linkedin.com/in/adnan-muhammed-s/"
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() => {
+                        trackEvent('social_click', { platform: 'linkedin', location: 'contact_section_card' });
+                      }}
                       className="p-4 rounded-xl bg-[#070A12]/60 dark:bg-[#070A12]/60 light:bg-slate-50 border border-white/5 dark:border-white/5 light:border-slate-200 hover:border-[#38BDF8]/50 transition-all flex items-center gap-4 group"
                     >
                       <div className="p-3 rounded-lg bg-[#38BDF8]/10 text-[#38BDF8] group-hover:scale-110 transition-transform">
@@ -347,11 +377,12 @@ export default function Contact() {
                       <div className="pt-2 max-w-sm mx-auto w-full space-y-3">
                         <button
                           type="button"
-                          onClick={() =>
+                          onClick={() => {
+                            trackEvent('contact_click', { channel: 'whatsapp', location: 'contact_cooldown_followup' });
                             openFollowUpWhatsApp(
                               `Hi Adnan, following up on my portfolio inquiry${cooldown.token ? ` (Ref: #${cooldown.token})` : ''} regarding a role/project.`
-                            )
-                          }
+                            );
+                          }}
                           className="btn-cyber-primary w-full justify-center py-3.5 shadow-lg flex items-center gap-2.5 text-sm cursor-pointer"
                         >
                           <FaWhatsapp className="text-lg text-[#10B981]" />
@@ -362,7 +393,10 @@ export default function Contact() {
                         <div>
                           <button
                             type="button"
-                            onClick={() => setBypassCooldown(true)}
+                            onClick={() => {
+                              trackEvent('contact_cooldown_bypass', { location: 'contact_section' });
+                              setBypassCooldown(true);
+                            }}
                             className="text-xs text-[#9AA4BC] hover:text-[#D4AF37] underline underline-offset-4 transition-colors cursor-pointer"
                           >
                             {t('contact.cooldownBypassBtn', 'Need to send an alternate inquiry? Click here')}
@@ -397,168 +431,169 @@ export default function Contact() {
                       <div className="pt-2 max-w-sm mx-auto w-full space-y-2.5">
                         <button
                           type="button"
-                          onClick={() =>
-                            openFollowUpWhatsApp(
-                              `Hi Adnan, I just submitted an inquiry via your portfolio${activeToken ? ` (Ref: #${activeToken})` : ''} and am connecting here as well.`
-                            )
-                          }
-                          className="w-full p-3 rounded-xl bg-[#10B981]/10 border border-[#10B981]/30 hover:border-[#10B981]/60 text-xs text-[#10B981] font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer group"
-                        >
-                          <FaWhatsapp className="text-base group-hover:scale-110 transition-transform" />
-                          <span>{t('contact.fastTrackPrompt', 'Prefer an immediate turnaround? Connect on WhatsApp')} &rarr;</span>
-                        </button>
+                            onClick = {() => {
+                          trackEvent('contact_click', { channel: 'whatsapp', location: 'contact_success_followup' });
+                        openFollowUpWhatsApp(
+                        `Hi Adnan, I just submitted an inquiry via your portfolio${activeToken ? ` (Ref: #${activeToken})` : ''} and am connecting here as well.`
+                        );
+                      }}
+                        className="w-full p-3 rounded-xl bg-[#10B981]/10 border border-[#10B981]/30 hover:border-[#10B981]/60 text-xs text-[#10B981] font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer group"
+                    >
+                        <FaWhatsapp className="text-base group-hover:scale-110 transition-transform" />
+                        <span>{t('contact.fastTrackPrompt', 'Prefer an immediate turnaround? Connect on WhatsApp')} &rarr;</span>
+                      </button>
 
-                        <button
-                          type="button"
-                          onClick={handleReset}
-                          className="btn-cyber-secondary text-xs px-6 py-2.5 w-full cursor-pointer"
-                        >
-                          {t('contact.sendAnother', 'Send Another Message')}
-                        </button>
+                      <button
+                        type="button"
+                        onClick={handleReset}
+                        className="btn-cyber-secondary text-xs px-6 py-2.5 w-full cursor-pointer"
+                      >
+                        {t('contact.sendAnother', 'Send Another Message')}
+                      </button>
+                    </div>
+                </div>
+                ) : (
+                <form onSubmit={handleSubmit} className="pt-5 flex-1 flex flex-col justify-between gap-4 relative">
+                  {/* Top Cyber Dispatch Shimmer Bar */}
+                  {status === 'submitting' && (
+                    <div className="absolute -top-5 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent animate-pulse" />
+                  )}
+
+                  {/* Honeypot anti-spam (off-screen, invisible to users & ignored by autofill) */}
+                  <div className="absolute opacity-0 pointer-events-none -z-50 h-0 w-0 overflow-hidden" aria-hidden="true">
+                    <input
+                      type="text"
+                      name="_security_honeypot_field"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      tabIndex="-1"
+                      autoComplete="new-password"
+                    />
+                  </div>
+
+                  {/* Error Alert Banner */}
+                  {status === 'error' && (
+                    <div
+                      role="alert"
+                      className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-start gap-3"
+                    >
+                      <FiAlertCircle className="text-lg flex-shrink-0 mt-0.5 text-red-400" />
+                      <div className="flex-1">
+                        <div className="font-semibold text-red-300">
+                          {t('contact.errorTitle', 'Message Delivery Failed')}
+                        </div>
+                        <div className="text-xs text-red-300/80 mt-1 leading-relaxed">
+                          {errorMessage || t('contact.errorDesc', 'Unable to send message. Please verify your EmailJS credentials or try again later.')}
+                        </div>
                       </div>
                     </div>
-                  ) : (
-                    <form onSubmit={handleSubmit} className="pt-5 flex-1 flex flex-col justify-between gap-4 relative">
-                      {/* Top Cyber Dispatch Shimmer Bar */}
-                      {status === 'submitting' && (
-                        <div className="absolute -top-5 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent animate-pulse" />
-                      )}
-
-                      {/* Honeypot anti-spam (off-screen, invisible to users & ignored by autofill) */}
-                      <div className="absolute opacity-0 pointer-events-none -z-50 h-0 w-0 overflow-hidden" aria-hidden="true">
-                        <input
-                          type="text"
-                          name="_security_honeypot_field"
-                          value={honeypot}
-                          onChange={(e) => setHoneypot(e.target.value)}
-                          tabIndex="-1"
-                          autoComplete="new-password"
-                        />
-                      </div>
-
-                      {/* Error Alert Banner */}
-                      {status === 'error' && (
-                        <div
-                          role="alert"
-                          className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-start gap-3"
-                        >
-                          <FiAlertCircle className="text-lg flex-shrink-0 mt-0.5 text-red-400" />
-                          <div className="flex-1">
-                            <div className="font-semibold text-red-300">
-                              {t('contact.errorTitle', 'Message Delivery Failed')}
-                            </div>
-                            <div className="text-xs text-red-300/80 mt-1 leading-relaxed">
-                              {errorMessage || t('contact.errorDesc', 'Unable to send message. Please verify your EmailJS credentials or try again later.')}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* Name */}
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-mono text-[#D4AF37] dark:text-[#D4AF37] light:text-amber-700 block">
-                            {t('contact.nameLabel', 'Your Name *')}
-                          </label>
-                          <input
-                            dir="ltr"
-                            type="text"
-                            required
-                            disabled={status === 'submitting'}
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            placeholder={t('contact.namePlaceholder', "What's your name?")}
-                            className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.15)] transition-all duration-200 text-left disabled:opacity-50"
-                          />
-                        </div>
-
-                        {/* Email */}
-                        <div className="space-y-1.5">
-                          <label className="text-xs font-mono text-[#D4AF37] dark:text-[#D4AF37] light:text-amber-700 block">
-                            {t('contact.emailLabel', 'Email Address *')}
-                          </label>
-                          <input
-                            dir="ltr"
-                            type="email"
-                            required
-                            disabled={status === 'submitting'}
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            placeholder={t('contact.emailPlaceholder', "What's your email?")}
-                            className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.15)] transition-all duration-200 text-left disabled:opacity-50"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Subject / Role */}
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-mono text-[#D4AF37] dark:text-[#D4AF37] light:text-amber-700 block">
-                          {t('contact.subjectLabel', 'Role / Subject *')}
-                        </label>
-                        <select
-                          dir="ltr"
-                          disabled={status === 'submitting'}
-                          value={formData.subject}
-                          onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 transition-all duration-200 text-left cursor-pointer disabled:opacity-50"
-                        >
-                          <option value="Full-Stack Developer Role">Full-Stack Developer Role (MERN / Next.js)</option>
-                          <option value="Backend Engineer Opportunity">Backend Engineer Opportunity (Node.js / Express)</option>
-                          <option value="Junior Cloud / DevOps Opportunity">Junior Cloud / DevOps Opportunity (AWS / Docker)</option>
-                          <option value="Contract / Project Inquiries">Contract / Project Inquiries</option>
-                        </select>
-                      </div>
-
-                      {/* Message */}
-                      <div className="space-y-1.5 flex-1 flex flex-col">
-                        <label className="text-xs font-mono text-[#D4AF37] dark:text-[#D4AF37] light:text-amber-700 block">
-                          {t('contact.messageLabel', 'Project or Opportunity Details *')}
-                        </label>
-                        <textarea
-                          dir="ltr"
-                          required
-                          disabled={status === 'submitting'}
-                          rows="5"
-                          value={formData.message}
-                          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                          placeholder={t('contact.messagePlaceholder', "What would you like to say? Tell me about the role, team, or project...")}
-                          className="w-full flex-1 min-h-[140px] px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.15)] transition-all duration-200 resize-none text-left disabled:opacity-50"
-                        />
-                      </div>
-
-                      {/* Submit Button with Live Cyber Steps */}
-                      <div className="pt-1">
-                        <button
-                          type="submit"
-                          disabled={status === 'submitting'}
-                          className="btn-cyber-primary w-full justify-center py-3.5 shadow-lg disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2 relative overflow-hidden group"
-                        >
-                          {status === 'submitting' ? (
-                            <>
-                              <FiLoader className="animate-spin text-base text-[#D4AF37]" />
-                              <span className="font-mono text-xs tracking-wide">
-                                {dispatchStep === 'encrypting'
-                                  ? t('contact.stepEncrypting', 'Encrypting payload...')
-                                  : t('contact.stepRouting', 'Routing via gateway...')}
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              <FiSend size={15} />
-                              <span>{t('contact.submitBtn', 'Send Message')}</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </form>
                   )}
-                </div>
-              </GlassCard>
-            </Reveal>
-          </div>
 
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Name */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-[#D4AF37] dark:text-[#D4AF37] light:text-amber-700 block">
+                        {t('contact.nameLabel', 'Your Name *')}
+                      </label>
+                      <input
+                        dir="ltr"
+                        type="text"
+                        required
+                        disabled={status === 'submitting'}
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder={t('contact.namePlaceholder', "What's your name?")}
+                        className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.15)] transition-all duration-200 text-left disabled:opacity-50"
+                      />
+                    </div>
+
+                    {/* Email */}
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-mono text-[#D4AF37] dark:text-[#D4AF37] light:text-amber-700 block">
+                        {t('contact.emailLabel', 'Email Address *')}
+                      </label>
+                      <input
+                        dir="ltr"
+                        type="email"
+                        required
+                        disabled={status === 'submitting'}
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder={t('contact.emailPlaceholder', "What's your email?")}
+                        className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.15)] transition-all duration-200 text-left disabled:opacity-50"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Subject / Role */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono text-[#D4AF37] dark:text-[#D4AF37] light:text-amber-700 block">
+                      {t('contact.subjectLabel', 'Role / Subject *')}
+                    </label>
+                    <select
+                      dir="ltr"
+                      disabled={status === 'submitting'}
+                      value={formData.subject}
+                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 transition-all duration-200 text-left cursor-pointer disabled:opacity-50"
+                    >
+                      <option value="Full-Stack Developer Role">Full-Stack Developer Role (MERN / Next.js)</option>
+                      <option value="Backend Engineer Opportunity">Backend Engineer Opportunity (Node.js / Express)</option>
+                      <option value="Junior Cloud / DevOps Opportunity">Junior Cloud / DevOps Opportunity (AWS / Docker)</option>
+                      <option value="Contract / Project Inquiries">Contract / Project Inquiries</option>
+                    </select>
+                  </div>
+
+                  {/* Message */}
+                  <div className="space-y-1.5 flex-1 flex flex-col">
+                    <label className="text-xs font-mono text-[#D4AF37] dark:text-[#D4AF37] light:text-amber-700 block">
+                      {t('contact.messageLabel', 'Project or Opportunity Details *')}
+                    </label>
+                    <textarea
+                      dir="ltr"
+                      required
+                      disabled={status === 'submitting'}
+                      rows="5"
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      placeholder={t('contact.messagePlaceholder', "What would you like to say? Tell me about the role, team, or project...")}
+                      className="w-full flex-1 min-h-[140px] px-4 py-3 rounded-xl bg-[#070A12]/80 dark:bg-[#070A12]/80 light:bg-slate-50 border border-white/10 dark:border-white/10 light:border-slate-300 text-sm text-white dark:text-white light:text-slate-900 focus:outline-none focus:border-[#D4AF37] focus:ring-1 focus:ring-[#D4AF37]/50 focus:shadow-[0_0_15px_rgba(212,175,55,0.15)] transition-all duration-200 resize-none text-left disabled:opacity-50"
+                    />
+                  </div>
+
+                  {/* Submit Button with Live Cyber Steps */}
+                  <div className="pt-1">
+                    <button
+                      type="submit"
+                      disabled={status === 'submitting'}
+                      className="btn-cyber-primary w-full justify-center py-3.5 shadow-lg disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer flex items-center gap-2 relative overflow-hidden group"
+                    >
+                      {status === 'submitting' ? (
+                        <>
+                          <FiLoader className="animate-spin text-base text-[#D4AF37]" />
+                          <span className="font-mono text-xs tracking-wide">
+                            {dispatchStep === 'encrypting'
+                              ? t('contact.stepEncrypting', 'Encrypting payload...')
+                              : t('contact.stepRouting', 'Routing via gateway...')}
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <FiSend size={15} />
+                          <span>{t('contact.submitBtn', 'Send Message')}</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+                  )}
+              </div>
+            </GlassCard>
+          </Reveal>
         </div>
-      </div >
+
+      </div>
+    </div >
     </section >
   );
 }
