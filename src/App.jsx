@@ -1,9 +1,12 @@
 import { useState, useEffect, lazy, Suspense } from 'react';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { LanguageProvider } from './i18n';
 import { ThemeProvider } from './context';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
+import Experience from './components/Experience';
 import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Architecture from './components/Architecture';
@@ -54,6 +57,7 @@ function AppContent() {
           <main id="main-content" tabIndex="-1" className="focus:outline-none">
             <Hero />
             <About />
+            <Experience />
             <Skills />
             <Projects />
             <Architecture />
@@ -65,6 +69,9 @@ function AppContent() {
           <Footer />
         </>
       )}
+
+      <Analytics />
+      <SpeedInsights />
     </div>
   );
 }

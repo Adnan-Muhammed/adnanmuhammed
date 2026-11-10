@@ -28,6 +28,7 @@ export default function Navbar() {
   const navLinks = [
     { label: t('nav.home', 'Home'), href: '#hero', id: 'hero' },
     { label: t('nav.about', 'About'), href: '#about', id: 'about' },
+    { label: t('nav.experience', 'Experience'), href: '#experience', id: 'experience' },
     { label: t('nav.skills', 'Skills'), href: '#skills', id: 'skills' },
     { label: t('nav.projects', 'Projects'), href: '#projects', id: 'projects' },
     { label: t('nav.architecture', 'Architecture'), href: '#architecture', id: 'architecture' },
@@ -54,7 +55,7 @@ export default function Navbar() {
 
   // Track active section
   useEffect(() => {
-    const sectionIds = ['hero', 'about', 'skills', 'projects', 'architecture', 'cv', 'terminal', 'contact'];
+    const sectionIds = ['hero', 'about', 'experience', 'skills', 'projects', 'architecture', 'cv', 'terminal', 'contact'];
     const observers = [];
 
     sectionIds.forEach((id) => {

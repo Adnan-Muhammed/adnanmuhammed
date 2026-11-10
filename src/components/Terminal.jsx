@@ -9,7 +9,8 @@ const COMMANDS = {
     'ADNAN MUHAMMED // DEVELOPER CONSOLE v4.0.0-noir',
     '──────────────────────────────────────',
     '  help          - List all available terminal commands',
-    '  about         - Background, self-taught path & focus areas',
+    '  about         - Background, career path & focus areas',
+    '  experience    - Work history & engineering experience',
     '  projects      - Overview of featured production systems',
     '  skills        - Core full-stack, DevOps & database technologies',
     '  cv            - Curriculum Vitae & profile summary',
@@ -24,9 +25,37 @@ const COMMANDS = {
   about: [
     'ADNAN MUHAMMED // Full-Stack Developer (MERN & Next.js) · Cloud Deployments',
     'Location: Kerala, India · Open for Remote & Global Relocation.',
-    'Background: Self-taught, project-based software engineer.',
+    'Experience: Independent Full-Stack Dev (Nov 2024–Present) · Brototype Intern (Jun 2023–Nov 2024)',
     'Focus: Building complete full-stack web applications, REST APIs,',
     '       low-latency real-time video/chat, and automated cloud deployments.',
+  ],
+  experience: [
+    '💼 ADNAN MUHAMMED // WORK EXPERIENCE & CAREER HISTORY',
+    '────────────────────────────────────────────────────────',
+    '1. INDEPENDENT FULL-STACK DEVELOPER',
+    '   Context  : Freelance & Independent Projects',
+    '   Type     : Freelance',
+    '   Period   : Nov 2024 – Present (Current)',
+    '   Location : Kerala, India · Remote',
+    '   Summary  : Focused on independent full-stack product development alongside',
+    '              freelance website and landing-page projects for local clients.',
+    '              Handled end-to-end development from application architecture',
+    '              to cloud deployment.',
+    '   Key Work : - Built production telemedicine (ZyDocCare) & real-time EdTech (LinguaChat).',
+    '              - Integrated WebRTC peer-to-peer video & Socket.IO messaging channels.',
+    '              - End-to-end architecture: Docker Compose, AWS EC2, S3 presigned URLs, CI/CD.',
+    '',
+    '2. MERN STACK DEVELOPER INTERN @ BROTOTYPE',
+    '   Context  : Brototype',
+    '   Type     : Intensive Apprenticeship (1.5 Years)',
+    '   Period   : Jun 2023 – Nov 2024',
+    '   Location : Kochi, Kerala, India',
+    '   Summary  : Completed 1.5 years of project-based MERN Stack training,',
+    '              gaining hands-on experience in building full-stack web applications,',
+    '              REST APIs, and database design.',
+    '   Key Work : - Built full-stack MVC E-Commerce platform with Razorpay integrations.',
+    '              - Scalable MongoDB schemas, indexing, aggregation & weekly code evaluations.',
+    '────────────────────────────────────────────────────────',
   ],
   skills: [
     '[FRONTEND]    : Next.js (App Router), React.js, TypeScript, JavaScript (ES6+), Tailwind CSS',
@@ -48,6 +77,7 @@ const COMMANDS = {
   cv: [
     '📄 ADNAN MUHAMMED // CURRICULUM VITAE SUMMARY',
     'Role: Production-Ready Full-Stack Developer (MERN & Next.js)',
+    'Experience: Independent Full-Stack Dev (Nov 2024–Present) | Brototype Intern (Jun 2023–Nov 2024)',
     'Core Focus: Next.js, React 19, Node.js, AWS (EC2/S3), Docker Compose, PM2, Vercel, WebRTC, MongoDB, PostgreSQL.',
     'Production Systems: ZyDocCare Health (Vercel/EC2/Docker Compose), LinguaChat (Vercel/AI), E-Commerce (EC2/PM2).',
     'Full Resume: Download PDF directly at /cv/Adnan-Muhammed-CV.pdf or view the CV section (#cv).',
@@ -107,7 +137,9 @@ const COMMANDS = {
   ],
 };
 
-const quickChips = ['help', 'about', 'projects', 'skills', 'cv', 'hire', 'contact', 'clear'];
+COMMANDS.exp = COMMANDS.experience;
+
+const quickChips = ['help', 'about', 'experience', 'projects', 'skills', 'cv', 'hire', 'contact', 'clear'];
 
 export default function Terminal() {
   const { t, lang } = useLanguage();

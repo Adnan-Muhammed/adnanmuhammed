@@ -38,6 +38,8 @@ public/images/brochures/
 public/images/creative/brochures/
 assets-source/
 
-# Private Analytics Documentation
+# Private Analytics Documentation & Local Dashboards
 GOOGLE_ANALYTICS_SETUP.md
+GA4_EVENTS_CHEATSHEET.md
+ga4-events-dashboard.html
 

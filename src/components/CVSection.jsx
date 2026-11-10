@@ -10,7 +10,8 @@ import {
   FiLayers,
   FiEye,
   FiX,
-  FiMaximize2
+  FiMaximize2,
+  FiBriefcase
 } from 'react-icons/fi';
 import { SectionTitle } from './ui/SectionTitle';
 import { GlassCard } from './ui/GlassCard';
@@ -134,6 +135,49 @@ export default function CVSection() {
                         'Full-Stack Engineering (Next.js, React 19, TypeScript, Node.js, Express) with distributed databases (PostgreSQL/Supabase, MongoDB), WebRTC/Socket.IO real-time channels, and automated AWS Cloud CI/CD.'
                       )}
                     </p>
+                  </div>
+
+                  {/* Work Experience */}
+                  <div className="p-3.5 rounded-xl bg-[#070A12]/70 dark:bg-[#070A12]/70 light:bg-slate-50 border border-white/5 dark:border-white/5 light:border-slate-200 space-y-2 text-start">
+                    <span className="text-[10px] font-mono text-[#22D3EE] dark:text-[#22D3EE] light:text-sky-600 uppercase tracking-wider font-bold flex items-center gap-1.5">
+                      <FiBriefcase size={12} />
+                      <span>{t('cvSection.experienceTitle', 'WORK EXPERIENCE')}</span>
+                    </span>
+                    <div className="space-y-2.5">
+                      <div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold text-white dark:text-white light:text-slate-900">
+                            {t('experience.independent.role', 'Independent Full-Stack Developer')}
+                          </span>
+                          <span className="text-[10px] font-mono text-[#D4AF37] dark:text-[#D4AF37] light:text-amber-700 font-semibold">
+                            Nov 2024 – Present
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono text-[#22D3EE] dark:text-[#22D3EE] light:text-sky-600 block">
+                          {t('experience.independent.company', 'Freelance & Independent Projects')}
+                        </span>
+                        <p className="text-[11px] text-[#9AA4BC] dark:text-[#9AA4BC] light:text-slate-600 mt-0.5 leading-snug">
+                          {t('experience.independent.cardDesc', 'Independent full-stack product development & freelance website solutions from architecture to cloud deployment.')}
+                        </p>
+                      </div>
+
+                      <div className="pt-2 border-t border-white/5 dark:border-white/5 light:border-slate-200">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold text-white dark:text-white light:text-slate-900">
+                            {t('experience.brototype.role', 'MERN Stack Developer Intern')}
+                          </span>
+                          <span className="text-[10px] font-mono text-[#9AA4BC] dark:text-[#9AA4BC] light:text-slate-500">
+                            Jun 2023 – Nov 2024
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono text-[#22D3EE] dark:text-[#22D3EE] light:text-sky-600 block">
+                          Brototype
+                        </span>
+                        <p className="text-[11px] text-[#9AA4BC] dark:text-[#9AA4BC] light:text-slate-600 mt-0.5 leading-snug">
+                          {t('experience.brototype.cardDesc', '1.5 years of project-based MERN Stack training, building full-stack web applications & REST APIs.')}
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Education, Languages & Details */}
