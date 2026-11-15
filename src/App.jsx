@@ -18,7 +18,7 @@ import Footer from './components/Footer';
 // Lazy-loaded Intro Gate
 const IntroGate = lazy(() => import('./components/intro/IntroGate'));
 
-function AppContent() {
+function AppContent() { 
   const [introComplete, setIntroComplete] = useState(false);
 
   // Prevent infinite iframe recursion loop (if an asset fails and Vite falls back to index.html inside an iframe)
